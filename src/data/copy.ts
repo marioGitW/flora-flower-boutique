@@ -17,8 +17,9 @@ export const copy = {
     intro: "Секоја прилика има свое цвеќе. Кажете ни ја Вашата, а ние ќе се погрижиме за останатото.",
     // Card action: opens call / Viber for that category.
     orderLabel: "Нарачајте",
-    callFor: "Повикај за", // + service name, used as accessible label
-    viberFor: "Пиши на Viber за", // + service name
+    // Sheet that opens when a card is tapped (JS only; without JS the card just calls).
+    sheetLead: "Јавете ни се или пишете ни — заедно ќе се договориме за деталите.",
+    sheetClose: "Затвори",
   },
 
   gallery: {
@@ -31,7 +32,6 @@ export const copy = {
     prev: "Претходна фотографија",
     next: "Следна фотографија",
     counter: "од", // "3 од 16"
-    empty: "Наскоро ќе додадеме фотографии и за оваа прилика.",
   },
 
   howToOrder: {
@@ -73,12 +73,12 @@ export const copy = {
     phoneLabel: "Телефон",
     hoursLabel: "Работно време",
     hoursPending: "Работното време наскоро ќе го објавиме.", // shown only if site.hours is null
-    writeLabel: "Пишете ни",
     viber: "Viber",
+    viberAction: "Пишете ни на Viber",
     whatsapp: "WhatsApp",
+    whatsappAction: "Пишете ни на WhatsApp",
     instagram: "Instagram",
     mapTitle: "Мапа — локација на бутикот Флора",
-    mapOpen: "Отворете ја локацијата на мапа",
   },
 
   nav: {
@@ -89,6 +89,7 @@ export const copy = {
     quickContact: "Брз контакт",
     stickyCall: "Повикај",
     stickyViber: "Viber",
+    headerCall: "Повикај",
     links: [
       { href: "#uslugi", label: "Услуги" },
       { href: "#galerija", label: "Галерија" },

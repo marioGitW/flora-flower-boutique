@@ -5,25 +5,46 @@ import { copy } from "../../data/copy";
 ---
 
 <div
-  class="fixed bottom-0 inset-x-0 z-40 flex gap-3 bg-cream/95 px-4 py-3 shadow-[0_-2px_12px_rgba(58,51,48,0.08)] backdrop-blur-sm md:hidden"
+  id="flora-sticky-call"
+  class="fixed inset-x-0 bottom-0 z-40 flex gap-3 bg-cream/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-2px_12px_rgba(58,51,48,0.08)] backdrop-blur-sm transition-transform duration-300 ease-out md:hidden"
   role="navigation"
   aria-label={copy.nav.quickContact}
 >
   <a
     href={site.phoneHref}
-    class="flex flex-1 items-center justify-center gap-2 rounded bg-rose-ink py-3.5 text-base font-medium text-cream transition-colors hover:bg-rose-ink-hover active:bg-rose-ink-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-ink"
+    class="flex min-h-12 flex-1 items-center justify-center gap-2 rounded bg-rose-ink text-base font-medium text-cream transition-colors hover:bg-rose-ink-hover active:bg-rose-ink-hover"
   >
     <ContactIcon name="phone" />
     {copy.nav.stickyCall}
   </a>
   <a
     href={site.viberHref}
-    class="flex flex-1 items-center justify-center gap-2 rounded bg-viber py-3.5 text-base font-medium text-cream transition-colors hover:bg-viber-hover active:bg-viber-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-viber"
+    class="flex min-h-12 flex-1 items-center justify-center gap-2 rounded bg-viber text-base font-medium text-cream transition-colors hover:bg-viber-hover active:bg-viber-hover"
   >
     <ContactIcon name="viber" />
     {copy.nav.stickyViber}
   </a>
 </div>
 
-<!-- Spacer to prevent content from hiding behind the bar on mobile -->
-<div class="h-[72px] md:hidden" aria-hidden="true"></div>
+{/* Spacer to prevent content from hiding behind the bar on mobile */}
+<div class="h-[76px] md:hidden" aria-hidden="true"></div>
+
+<style>
+  #flora-sticky-call.is-tucked {
+    transform: translateY(110%);
+  }
+</style>
+
+<script>
+  // While the hero's own call/Viber buttons are on screen the bar would only
+  // duplicate them; it slides in as soon as they scroll away.
+  const bar = document.getElementById("flora-sticky-call");
+  const heroCtas = document.querySelector("[data-hero-ctas]");
+
+  if (bar && heroCtas) {
+    new IntersectionObserver(([entry]) => {
+      bar.classList.toggle("is-tucked", entry.isIntersecting);
+      bar.toggleAttribute("inert", entry.isIntersecting);
+    }).observe(heroCtas);
+  }
+</script>

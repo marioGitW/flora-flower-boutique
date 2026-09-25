@@ -20,20 +20,19 @@ export const site = {
     full: "Ул. 3-та МУБ бр. 30, Куманово",
   },
 
-  // TODO: coordinates not confirmed — check against the shop's real pin before launch (used in JSON-LD).
+  // From the shop's own Google Maps place ("Цвеќара Флора").
   geo: {
-    lat: 42.1322,
-    lng: 21.7144,
+    lat: 42.1315,
+    lng: 21.71895,
   },
 
   // TODO: days not confirmed — only the time is known. Add e.g. days: "Понеделник – Сабота".
   hours: [{ time: "10:00 – 18:00" }] as null | ReadonlyArray<{ days?: string; time: string }>,
 
-  mapUrl:
-    "https://maps.google.com/?q=Ул.+3-та+МУБ+бр.+30,+Куманово",
-  // Keyless embed, searched by address (not by the unconfirmed geo pin).
+  // Google Maps place "Цвеќара Флора" — the owner's pin.
+  mapUrl: "https://maps.google.com/?cid=3073187388721178971",
   mapEmbedUrl:
-    "https://maps.google.com/maps?q=%D0%A3%D0%BB.%203-%D1%82%D0%B0%20%D0%9C%D0%A3%D0%91%2030%2C%20%D0%9A%D1%83%D0%BC%D0%B0%D0%BD%D0%BE%D0%B2%D0%BE&z=16&output=embed",
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d503.25964542926715!2d21.71895419601442!3d42.13150003701935!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13544f00096d24cd%3A0x2aa627a5c8efa95b!2z0KbQstC10ZzQsNGA0LAg0KTQu9C-0YDQsA!5e1!3m2!1smk!2smk!4v1790367880145!5m2!1smk!2smk",
 
   meta: {
     title: "Флора — Бутик за цвеќе | Куманово",

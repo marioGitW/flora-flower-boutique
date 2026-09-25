@@ -1,77 +1,185 @@
 ---
 import { copy } from "../../data/copy";
 
-interface Props {
-  class?: string;
-}
-
-const { class: className = "" } = Astro.props;
+const t = copy.gallery;
 ---
 
-<flora-lightbox class={className}>
-  <dialog
-    class="flora-lightbox-dialog fixed inset-0 z-50 m-0 h-dvh w-dvw max-h-none max-w-none bg-ink/90 p-4 backdrop:bg-transparent"
-  >
-    <button
-      class="flora-lightbox-close absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-cream/20 text-cream hover:bg-cream/40 transition-colors"
-      aria-label={copy.gallery.close}
-    >
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="4" y1="4" x2="16" y2="16" />
-        <line x1="16" y1="4" x2="4" y2="16" />
-      </svg>
-    </button>
-    <div class="flex h-full w-full items-center justify-center">
-      <img
-        class="flora-lightbox-img max-h-full max-w-full object-contain rounded"
-        src=""
-        alt=""
-      />
+{/*
+  Opens for any [data-lightbox] link. Browses only the tiles currently shown
+  (so it follows the active filter). Native modal <dialog>: page is inert and
+  focus stays inside while open; Esc closes; focus goes back to the tile.
+*/}
+<dialog id="flora-lightbox" class="flora-lightbox" aria-label={t.heading}>
+  <div class="flex h-full w-full flex-col">
+    <div class="flex items-center justify-between px-3 pt-3 text-cream">
+      <p class="px-2 text-sm tabular-nums text-cream/90" aria-live="polite" data-lb-counter></p>
+      <button type="button" class="flora-lb-btn" data-lb-close aria-label={t.close}>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M4 4l12 12M16 4 4 16" />
+        </svg>
+      </button>
     </div>
-  </dialog>
-  <slot />
-</flora-lightbox>
 
-<script>
-  class FloraLightbox extends HTMLElement {
-    private dialog: HTMLDialogElement | null = null;
-    private img: HTMLImageElement | null = null;
+    <div class="flora-lb-stage relative flex min-h-0 flex-1 items-center justify-center px-3 py-4 sm:px-20" data-lb-stage>
+      <img class="flora-lb-img max-h-full max-w-full rounded object-contain" src="" alt="" data-lb-img />
 
-    connectedCallback() {
-      this.dialog = this.querySelector(".flora-lightbox-dialog");
-      this.img = this.querySelector(".flora-lightbox-img");
-      const closeBtn = this.querySelector(".flora-lightbox-close");
+      <button type="button" class="flora-lb-btn flora-lb-nav left-2 sm:left-5" data-lb-prev aria-label={t.prev}>
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" /></svg>
+      </button>
+      <button type="button" class="flora-lb-btn flora-lb-nav right-2 sm:right-5" data-lb-next aria-label={t.next}>
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m7.5 4 6 6-6 6" /></svg>
+      </button>
+    </div>
+  </div>
+</dialog>
 
-      this.addEventListener("click", (e) => {
-        const trigger = (e.target as HTMLElement).closest("[data-lightbox-src]");
-        if (!trigger) return;
-        const src = trigger.getAttribute("data-lightbox-src") || "";
-        const alt = trigger.getAttribute("data-lightbox-alt") || "";
-        this.open(src, alt);
-      });
-
-      closeBtn?.addEventListener("click", () => this.close());
-
-      this.dialog?.addEventListener("click", (e) => {
-        if (e.target === this.dialog) this.close();
-      });
-
-      this.dialog?.addEventListener("cancel", () => this.close());
-    }
-
-    open(src: string, alt: string) {
-      if (!this.dialog || !this.img) return;
-      this.img.src = src;
-      this.img.alt = alt;
-      this.dialog.showModal();
-      document.body.style.overflow = "hidden";
-    }
-
-    close() {
-      this.dialog?.close();
-      document.body.style.overflow = "";
+<style>
+  .flora-lightbox {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0 0 env(safe-area-inset-bottom);
+    border: 0;
+    background: rgb(30 26 24 / 0.96);
+  }
+  .flora-lightbox::backdrop {
+    background: transparent;
+  }
+  .flora-lightbox :focus-visible {
+    outline-color: var(--color-cream);
+  }
+  .flora-lb-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    color: var(--color-cream);
+    background: rgb(251 247 242 / 0.12);
+    transition: background-color 0.2s;
+  }
+  .flora-lb-btn:hover {
+    background: rgb(251 247 242 / 0.24);
+  }
+  .flora-lb-nav {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+  }
+  .flora-lb-stage {
+    touch-action: pan-y pinch-zoom;
+  }
+  .flora-lb-img {
+    transition:
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.2s;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .flora-lb-img.is-dragging {
+    transition: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flora-lb-img {
+      transition: none;
     }
   }
+</style>
 
-  customElements.define("flora-lightbox", FloraLightbox);
+<script>
+  import { copy } from "../../data/copy";
+  import { trapTab } from "../../scripts/focus-trap";
+
+  const dialog = document.getElementById("flora-lightbox") as HTMLDialogElement | null;
+
+  if (dialog) {
+    const img = dialog.querySelector<HTMLImageElement>("[data-lb-img]")!;
+    const stage = dialog.querySelector<HTMLElement>("[data-lb-stage]")!;
+    const counter = dialog.querySelector<HTMLElement>("[data-lb-counter]")!;
+
+    let list: HTMLAnchorElement[] = [];
+    let index = 0;
+    let trigger: HTMLAnchorElement | null = null;
+
+    const visibleTiles = () =>
+      [...document.querySelectorAll<HTMLAnchorElement>("a[data-lightbox]")].filter((a) => !a.closest("[hidden]"));
+
+    const show = (i: number) => {
+      index = (i + list.length) % list.length;
+      const a = list[index];
+      img.src = a.href;
+      img.alt = a.dataset.alt ?? "";
+      img.width = Number(a.dataset.w);
+      img.height = Number(a.dataset.h);
+      img.style.transform = "";
+      counter.textContent = `${index + 1} ${copy.gallery.counter} ${list.length}`;
+    };
+
+    document.addEventListener("click", (e) => {
+      const a = (e.target as Element).closest<HTMLAnchorElement>("a[data-lightbox]");
+      if (!a) return;
+      e.preventDefault();
+      list = visibleTiles();
+      trigger = a;
+      show(list.indexOf(a));
+      document.documentElement.classList.add("scroll-lock");
+      dialog.showModal();
+    });
+
+    dialog.querySelector("[data-lb-close]")!.addEventListener("click", () => dialog.close());
+    dialog.querySelector("[data-lb-prev]")!.addEventListener("click", () => show(index - 1));
+    dialog.querySelector("[data-lb-next]")!.addEventListener("click", () => show(index + 1));
+
+    dialog.addEventListener("keydown", (e) => {
+      trapTab(dialog, e);
+      if (e.key === "ArrowLeft") show(index - 1);
+      else if (e.key === "ArrowRight") show(index + 1);
+    });
+
+    // Click on the dark area around the photo closes, like tapping outside.
+    stage.addEventListener("click", (e) => {
+      if (e.target === stage) dialog.close();
+    });
+
+    dialog.addEventListener("close", () => {
+      document.documentElement.classList.remove("scroll-lock");
+      img.removeAttribute("src");
+      trigger?.focus();
+      trigger = null;
+    });
+
+    // Swipe: follow the finger horizontally, change photo past a threshold.
+    let startX = 0;
+    let startY = 0;
+    let dragging = false;
+
+    stage.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse" || e.target !== img) return;
+      startX = e.clientX;
+      startY = e.clientY;
+      dragging = true;
+      img.classList.add("is-dragging");
+    });
+
+    stage.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > Math.abs(e.clientY - startY)) img.style.transform = `translateX(${dx}px)`;
+    });
+
+    const endDrag = (e: PointerEvent) => {
+      if (!dragging) return;
+      dragging = false;
+      img.classList.remove("is-dragging");
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) show(index + (dx < 0 ? 1 : -1));
+      else img.style.transform = "";
+    };
+    stage.addEventListener("pointerup", endDrag);
+    stage.addEventListener("pointercancel", endDrag);
+  }
 </script>

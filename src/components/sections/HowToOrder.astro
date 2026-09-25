@@ -3,52 +3,54 @@ import { site } from "../../data/site";
 import { copy } from "../../data/copy";
 import Reveal from "../motion/Reveal.astro";
 import DrawLine from "../motion/DrawLine.astro";
+import SectionHeading from "../ui/SectionHeading.astro";
+import ContactIcon from "../ui/ContactIcon.astro";
 
-const steps = copy.howToOrder.steps.map((step, i) => ({
-  ...step,
-  num: String(i + 1).padStart(2, "0"),
-}));
+const t = copy.howToOrder;
 ---
 
-<section id="kako-naracuvate" class="bg-mint/30 py-16 md:py-24" aria-label={copy.howToOrder.heading}>
-  <div class="mx-auto max-w-6xl px-4">
-    <Reveal>
-      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">
-        {copy.howToOrder.heading}
-      </h2>
-    </Reveal>
-
-    <Reveal delay={100}>
-      <DrawLine class="mx-auto mt-4 max-w-[200px]" />
-    </Reveal>
-
-    <Reveal delay={200}>
-      <p class="mx-auto mt-6 max-w-lg text-center text-ink/75">
-        {copy.howToOrder.intro}
-      </p>
-    </Reveal>
-
-    <div class="mt-12 grid gap-8 md:grid-cols-3">
-      {steps.map((step, i) => (
-        <Reveal delay={i * 120}>
-          <div class="text-center">
-            <span class="font-display text-4xl text-rose/40">{step.num}</span>
-            <h3 class="mt-2 font-display text-xl text-ink">{step.title}</h3>
-            <p class="mt-2 text-ink/70">{step.text}</p>
-          </div>
-        </Reveal>
-      ))}
-    </div>
-
-    <Reveal delay={400}>
-      <div class="mt-10 text-center">
+<section id="kako-naracuvate" class="bg-mint/40 py-20 lg:py-28" aria-labelledby="kako-title">
+  <div class="mx-auto max-w-6xl px-4 lg:grid lg:grid-cols-[5fr_7fr] lg:gap-16">
+    <div class="lg:sticky lg:top-28 lg:self-start">
+      <SectionHeading id="kako-title" title={t.heading} intro={t.intro} alignLeftLg />
+      <div class="mt-8 hidden lg:block">
         <a
           href={site.phoneHref}
-          class="inline-flex items-center justify-center rounded bg-rose px-6 py-3 text-base font-medium text-cream transition-colors hover:bg-rose-deep"
+          class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-rose-ink px-6 py-3 text-base font-medium text-cream transition-colors hover:bg-rose-ink-hover"
         >
-          {copy.howToOrder.cta} {site.phoneFormatted}
+          <ContactIcon name="phone" />
+          {t.cta} {site.phoneFormatted}
         </a>
       </div>
-    </Reveal>
+    </div>
+
+    <ol class="mx-auto mt-12 max-w-md lg:mx-0 lg:mt-2 lg:max-w-none" role="list">
+      {t.steps.map((step, i) => (
+        <li>
+          {i > 0 && <DrawLine variant="botanical" class="mx-auto my-8 w-48 lg:mx-0 lg:my-10 lg:w-64" />}
+          <Reveal delay={80}>
+            <div class="text-center lg:flex lg:gap-8 lg:text-left">
+              <span class="block font-display text-5xl leading-none text-rose-ink lg:w-16 lg:flex-none lg:text-6xl" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <h3 class="mt-3 font-display text-2xl text-ink lg:mt-1 lg:text-3xl">{step.title}</h3>
+                <p class="mt-2 text-base leading-relaxed text-ink/80 lg:text-lg">{step.text}</p>
+              </div>
+            </div>
+          </Reveal>
+        </li>
+      ))}
+    </ol>
+
+    <div class="mt-12 text-center lg:hidden">
+      <a
+        href={site.phoneHref}
+        class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-rose-ink px-6 py-3 text-base font-medium text-cream transition-colors hover:bg-rose-ink-hover"
+      >
+        <ContactIcon name="phone" />
+        {t.cta} {site.phoneFormatted}
+      </a>
+    </div>
   </div>
 </section>

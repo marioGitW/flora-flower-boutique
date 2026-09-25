@@ -44,6 +44,7 @@ const jsonLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>document.documentElement.classList.add("js");</script>
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -54,7 +55,7 @@ const jsonLd = {
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#FBF7F2" />
 
-    <!-- Open Graph -->
+    {/* Open Graph */}
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -66,7 +67,7 @@ const jsonLd = {
     <meta property="og:locale" content="mk_MK" />
     <meta property="og:site_name" content={site.nameFull} />
 
-    <!-- JSON-LD -->
+    {/* JSON-LD */}
     <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body class="min-h-dvh bg-cream text-ink font-body antialiased">

@@ -24,20 +24,20 @@ import { copy } from "../data/copy";
     <Contact />
   </main>
 
-  <footer class="bg-ink py-10 text-cream/70">
+  <footer class="flora-footer bg-ink py-12 text-cream/80">
     <div class="mx-auto max-w-6xl px-4 text-center">
-      <p class="font-display text-lg text-cream">{site.name}</p>
-      <p class="mt-1 text-sm">{site.tagline}</p>
-      <div class="mt-4 flex items-center justify-center gap-4 text-sm">
-        <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class="hover:text-cream transition-colors">
-          {copy.contact.instagram}
-        </a>
-        <span class="text-cream/30">·</span>
-        <a href={site.phoneHref} class="hover:text-cream transition-colors">
-          {site.phoneFormatted}
-        </a>
-      </div>
-      <p class="mt-6 text-xs text-cream/40">
+      <p class="font-display text-2xl text-cream">{site.name}</p>
+      <p class="mt-1 font-display italic">{site.tagline}</p>
+      <ul class="mt-5 flex flex-wrap items-center justify-center gap-x-6 text-sm" role="list">
+        <li><a href={site.phoneHref} class="inline-block py-2 transition-colors hover:text-cream">{site.phoneFormatted}</a></li>
+        <li><a href={site.viberHref} class="inline-block py-2 transition-colors hover:text-cream">{copy.contact.viber}</a></li>
+        <li>
+          <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class="inline-block py-2 transition-colors hover:text-cream">
+            {copy.contact.instagram}
+          </a>
+        </li>
+      </ul>
+      <p class="mt-6 text-xs text-cream/75">
         &copy; {new Date().getFullYear()} {site.nameFull}. {copy.footer.rights}
       </p>
     </div>
@@ -45,3 +45,9 @@ import { copy } from "../data/copy";
 
   <StickyCallBar />
 </Base>
+
+<style>
+  .flora-footer :focus-visible {
+    outline-color: var(--color-cream);
+  }
+</style>

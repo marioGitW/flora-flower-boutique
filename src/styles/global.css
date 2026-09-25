@@ -79,6 +79,83 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-ink);
 }
 
+/* One focus ring for everything interactive. Components may override the
+   colour (e.g. light ring on dark surfaces) but never remove it. */
+:focus-visible {
+  outline: 2px solid var(--color-rose-ink);
+  outline-offset: 3px;
+}
+
+/* Anchor targets clear the fixed header. */
+section[id] {
+  scroll-margin-top: 4rem;
+}
+
+html.scroll-lock {
+  overflow: hidden;
+}
+
+/* `js` is set on <html> by an inline script in <head>. Anything that only
+   works with JavaScript is hidden without it; content never is. */
+html:not(.js) .js-only {
+  display: none !important;
+}
+
+flora-reveal,
+flora-draw-line {
+  display: block;
+}
+
+.js flora-reveal > * {
+  opacity: 0;
+}
+
+/* Inset moulding line, after the painted wall panels in the shop. */
+.flora-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0.5rem;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-radius: calc(var(--radius) - 0.5rem);
+  pointer-events: none;
+}
+
+/* ── Masonry ───────────────────────────────────────────────
+   Tiles span a number of tiny rows proportional to their real aspect ratio
+   (set per tile as --span). Rows are 1/100 of a column's width, measured via
+   container units on the wrapper, so DOM order = visual order at any width. */
+
+.flora-masonry-wrap {
+  container-type: inline-size;
+}
+
+.flora-masonry {
+  --cols: 2;
+  --gap: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gap);
+  grid-auto-rows: calc((100cqi - (var(--cols) - 1) * var(--gap)) / var(--cols) / 100);
+}
+
+.flora-masonry > * {
+  grid-row-end: span var(--span);
+}
+
+@media (min-width: 640px) {
+  .flora-masonry {
+    --cols: 3;
+    --gap: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .flora-masonry {
+    --cols: 4;
+    --gap: 1.25rem;
+  }
+}
+
 /* ── Motion primitives — shared keyframes ──────────────── */
 
 @keyframes flora-fade-rise {
@@ -140,5 +217,11 @@ h1, h2, h3, h4, h5, h6 {
 
   .flora-petal-field {
     display: none !important;
+  }
+
+  /* Final state immediately — don't wait for the observer to fire. */
+  .js flora-reveal > * {
+    opacity: 1 !important;
+    animation: none !important;
   }
 }

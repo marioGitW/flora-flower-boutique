@@ -3,9 +3,16 @@ interface Props {
   class?: string;
   size?: number;
   petalCount?: number;
+  /** Petal fill; defaults to rose. */
+  color?: string;
 }
 
-const { class: className = "", size = 80, petalCount = 6 } = Astro.props;
+const {
+  class: className = "",
+  size = 80,
+  petalCount = 6,
+  color = "var(--color-rose)",
+} = Astro.props;
 
 const petals = Array.from({ length: petalCount }, (_, i) => ({
   angle: (360 / petalCount) * i,
@@ -14,76 +21,71 @@ const petals = Array.from({ length: petalCount }, (_, i) => ({
 ---
 
 <flora-bloom class={`inline-block ${className}`}>
-  <svg
-    viewBox="0 0 100 100"
-    width={size}
-    height={size}
-    aria-hidden="true"
-    class="flora-bloom-svg"
-  >
+  <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true" class="block">
     <g transform="translate(50,50)">
       {petals.map((p) => (
-        <ellipse
-          cx="0"
-          cy="-18"
-          rx="8"
-          ry="18"
-          fill="var(--color-rose)"
-          opacity="0.5"
-          transform={`rotate(${p.angle})`}
-          class="flora-bloom-petal"
-          style={`
-            transform-origin: center center;
-            opacity: 0;
-            animation-delay: ${p.delay}s;
-          `}
-        />
+        // Rotation lives on the wrapper: a CSS transform on the ellipse itself
+        // would replace its SVG transform attribute and stack every petal.
+        <g transform={`rotate(${p.angle})`}>
+          <ellipse
+            cx="0"
+            cy="-18"
+            rx="8"
+            ry="18"
+            fill={color}
+            fill-opacity="0.5"
+            class="flora-bloom-part"
+            style={`--flora-bloom-delay: ${p.delay}s`}
+          />
+        </g>
       ))}
-      <circle cx="0" cy="0" r="6" fill="var(--color-gold)" opacity="0.8" class="flora-bloom-center" style="opacity: 0;" />
+      <circle
+        r="6"
+        fill="var(--color-gold)"
+        fill-opacity="0.8"
+        class="flora-bloom-part"
+        style={`--flora-bloom-delay: ${petalCount * 0.12 + 0.1}s`}
+      />
     </g>
   </svg>
 </flora-bloom>
 
-<script>
-  class FloraBloom extends HTMLElement {
-    private observer: IntersectionObserver | null = null;
-
-    connectedCallback() {
-      const prefersReduced = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
-      if (prefersReduced) {
-        this.querySelectorAll<SVGElement>(".flora-bloom-petal, .flora-bloom-center").forEach((el) => {
-          el.style.opacity = "1";
-          el.style.transform = el.getAttribute("transform") || "";
-        });
-        return;
-      }
-
-      this.observer = new IntersectionObserver(
-        ([entry]) => {
-          if (!entry.isIntersecting) return;
-
-          this.querySelectorAll<SVGElement>(".flora-bloom-petal").forEach((petal) => {
-            petal.style.animation = `flora-bloom 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${petal.style.animationDelay} forwards`;
-          });
-
-          const center = this.querySelector<SVGElement>(".flora-bloom-center");
-          if (center) {
-            const petalCount = this.querySelectorAll(".flora-bloom-petal").length;
-            center.style.animation = `flora-bloom 0.4s cubic-bezier(0.22, 1, 0.36, 1) ${petalCount * 0.12 + 0.1}s forwards`;
-          }
-
-          this.observer?.unobserve(this);
-        },
-        { threshold: 0.5 },
-      );
-      this.observer.observe(this);
+<style>
+  .flora-bloom-part {
+    transform-origin: 0 0;
+  }
+  :global(.js) .flora-bloom-part {
+    opacity: 0;
+  }
+  flora-bloom[data-bloomed] .flora-bloom-part {
+    animation: flora-bloom 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--flora-bloom-delay, 0s) forwards;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .flora-bloom-part {
+      opacity: 1;
+      animation: none !important;
     }
+  }
+</style>
 
+<script>
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        (entry.target as HTMLElement).dataset.bloomed = "";
+        observer.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.5 },
+  );
+
+  class FloraBloom extends HTMLElement {
+    connectedCallback() {
+      observer.observe(this);
+    }
     disconnectedCallback() {
-      this.observer?.disconnect();
+      observer.unobserve(this);
     }
   }
 

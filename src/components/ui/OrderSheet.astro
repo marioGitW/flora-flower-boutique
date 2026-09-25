@@ -1,0 +1,113 @@
+---
+import { site } from "../../data/site";
+import { copy } from "../../data/copy";
+import ContactIcon from "./ContactIcon.astro";
+---
+
+{/*
+  Any link with [data-order="<service name>"] opens this sheet instead of dialling
+  straight away. Without JS those links are plain tel: links, so ordering still works.
+*/}
+<dialog id="flora-order-sheet" class="flora-sheet" aria-labelledby="flora-order-sheet-title">
+  <div class="relative px-5 pb-6 pt-7 sm:px-8 sm:pb-8">
+    <button
+      type="button"
+      data-sheet-close
+      class="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full text-ink/80 transition-colors hover:bg-ink/5"
+      aria-label={copy.services.sheetClose}
+    >
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M4 4l12 12M16 4 4 16" />
+      </svg>
+    </button>
+
+    <p class="text-sm font-medium text-rose-ink">{copy.services.orderLabel}</p>
+    <h2 id="flora-order-sheet-title" class="mt-1 pr-10 font-display text-3xl leading-tight text-ink" data-sheet-name></h2>
+    <p class="mt-3 text-ink/80">{copy.services.sheetLead}</p>
+
+    <div class="mt-6 grid gap-3">
+      <a
+        href={site.phoneHref}
+        class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-rose-ink px-5 py-3 text-base font-medium text-cream transition-colors hover:bg-rose-ink-hover"
+      >
+        <ContactIcon name="phone" />
+        {copy.hero.callLabel} {site.phoneFormatted}
+      </a>
+      <a
+        href={site.viberHref}
+        class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-viber px-5 py-3 text-base font-medium text-cream transition-colors hover:bg-viber-hover"
+      >
+        <ContactIcon name="viber" />
+        {copy.hero.viberLabel}
+      </a>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .flora-sheet {
+    margin: auto auto 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: var(--color-cream);
+    color: var(--color-ink);
+    padding: 0 0 env(safe-area-inset-bottom);
+    border: 0;
+  }
+  .flora-sheet::backdrop {
+    background: rgb(58 51 48 / 0.45);
+  }
+  .flora-sheet[open] {
+    animation: flora-sheet-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (min-width: 640px) {
+    .flora-sheet {
+      margin: auto;
+      max-width: 28rem;
+      border-radius: var(--radius-lg);
+    }
+  }
+  @keyframes flora-sheet-in {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  import { trapTab } from "../../scripts/focus-trap";
+
+  const sheet = document.getElementById("flora-order-sheet") as HTMLDialogElement | null;
+  const nameEl = sheet?.querySelector<HTMLElement>("[data-sheet-name]");
+  let trigger: HTMLElement | null = null;
+
+  if (sheet && nameEl) {
+    document.addEventListener("click", (e) => {
+      const link = (e.target as Element).closest<HTMLElement>("[data-order]");
+      if (!link) return;
+      e.preventDefault();
+      trigger = link;
+      nameEl.textContent = link.dataset.order ?? "";
+      document.documentElement.classList.add("scroll-lock");
+      sheet.showModal();
+    });
+
+    sheet.addEventListener("keydown", (e) => trapTab(sheet, e));
+
+    sheet.querySelector("[data-sheet-close]")?.addEventListener("click", () => sheet.close());
+
+    // Tap on the backdrop (the dialog box itself, outside its content) closes.
+    sheet.addEventListener("click", (e) => {
+      if (e.target === sheet) sheet.close();
+    });
+
+    // Fires for Esc, the close button and backdrop taps alike.
+    sheet.addEventListener("close", () => {
+      document.documentElement.classList.remove("scroll-lock");
+      trigger?.focus();
+      trigger = null;
+    });
+  }
+</script>

@@ -1,69 +1,183 @@
 ---
 import { getCollection } from "astro:content";
 import { Picture, getImage } from "astro:assets";
-import Reveal from "../motion/Reveal.astro";
-import DrawLine from "../motion/DrawLine.astro";
-import Lightbox from "../ui/Lightbox.astro";
 import { copy } from "../../data/copy";
+import SectionHeading from "../ui/SectionHeading.astro";
+import Lightbox from "../ui/Lightbox.astro";
 
 const gallery = await getCollection("gallery");
+const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
 
-// Don't read properties off item.data.src here: any access marks the original
-// as referenced and Astro then copies the full PNG into dist.
+// Chips follow services.json order; a category shows up once it has a photo.
+const chips = services
+  .map((s) => ({ id: s.id, name: s.data.name, count: gallery.filter((g) => g.data.category === s.id).length }))
+  .filter((c) => c.count > 0);
+
+const wells = ["bg-blush", "bg-mint", "bg-butter", "bg-lilac"];
+// Extra rows under each tile, in 1/100-column units — acts as the vertical gap.
+const GAP_ROWS = 5;
+
 const thumbWidths = [240, 360, 480, 720];
 const thumbSizes =
-  "(min-width: 1024px) 270px, (min-width: 640px) calc((100vw - 64px) / 3), calc((100vw - 48px) / 2)";
+  "(min-width: 1280px) 290px, (min-width: 1024px) calc((100vw - 92px) / 4), (min-width: 640px) calc((100vw - 64px) / 3), calc((100vw - 44px) / 2)";
 
 const items = await Promise.all(
-  gallery.map(async (item) => {
-    const full = await getImage({ src: item.data.src, format: "webp", quality: 80 });
-    return { ...item.data, fullSrc: full.src };
+  gallery.map(async (item, i) => {
+    const { src, alt, category } = item.data;
+    const full = await getImage({ src, format: "webp", quality: 80 });
+    return {
+      src,
+      alt,
+      category,
+      fullSrc: full.src,
+      w: src.width,
+      h: src.height,
+      span: Math.ceil((100 * src.height) / src.width) + GAP_ROWS,
+      well: wells[i % wells.length],
+    };
   }),
 );
 ---
 
-<section id="galerija" class="bg-cream py-16 md:py-24" aria-label={copy.gallery.heading}>
-  <div class="mx-auto max-w-6xl px-4">
-    <Reveal>
-      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">{copy.gallery.heading}</h2>
-    </Reveal>
+<section id="galerija" class="bg-cream pb-20 pt-4 lg:pb-28" aria-labelledby="galerija-title">
+  <div class="mx-auto max-w-7xl px-4">
+    <SectionHeading id="galerija-title" title={copy.gallery.heading} intro={copy.gallery.intro} />
 
-    <Reveal delay={100}>
-      <DrawLine class="mx-auto mt-4 max-w-[200px]" />
-    </Reveal>
-
-    <Reveal delay={200}>
-      <p class="mx-auto mt-6 max-w-lg text-center text-ink/70">
-        {copy.gallery.intro}
-      </p>
-    </Reveal>
-
-    <Lightbox class="mt-12">
-      <div class="columns-2 gap-4 sm:columns-3 lg:columns-4">
-        {items.map((item, i) => (
-          <Reveal delay={i * 40} class="mb-4 break-inside-avoid">
-            <button
-              class="block w-full overflow-hidden rounded cursor-pointer border-0 p-0 bg-mint/30"
-              data-lightbox-src={item.fullSrc}
-              data-lightbox-alt={item.alt}
-              aria-label={`${copy.gallery.open} ${item.alt}`}
-            >
-              <Picture
-                src={item.src}
-                alt={item.alt}
-                formats={["avif", "webp"]}
-                fallbackFormat="webp"
-                widths={thumbWidths}
-                sizes={thumbSizes}
-                quality={75}
-                loading="lazy"
-                decoding="async"
-                class="block h-auto w-full transition-transform duration-300 hover:scale-105"
-              />
+    <flora-gallery class="mt-10 block">
+      <div
+        class="js-only sticky top-16 z-20 -mx-4 bg-cream/95 px-3 py-2 backdrop-blur-sm lg:static lg:bg-transparent lg:backdrop-blur-none"
+        role="group"
+        aria-label={copy.gallery.filterLabel}
+      >
+        <div class="flora-chips flex gap-2 overflow-x-auto p-1 lg:flex-wrap lg:justify-center lg:overflow-visible">
+          <button type="button" class="flora-chip" data-filter="*" aria-pressed="true">
+            {copy.gallery.filterAll}
+          </button>
+          {chips.map((c) => (
+            <button type="button" class="flora-chip" data-filter={c.id} aria-pressed="false">
+              {c.name}
             </button>
-          </Reveal>
-        ))}
+          ))}
+        </div>
       </div>
-    </Lightbox>
+
+      <div class="flora-masonry-wrap mt-4 lg:mt-8">
+        <ul class="flora-masonry flora-gallery-grid" role="list">
+          {items.map((item) => (
+            <li style={`--span: ${item.span}`} data-category={item.category}>
+              <a
+                href={item.fullSrc}
+                data-lightbox
+                data-w={item.w}
+                data-h={item.h}
+                data-alt={item.alt}
+                class:list={["flora-panel flora-tile group relative block overflow-hidden rounded", item.well]}
+                style={`aspect-ratio: ${item.w} / ${item.h}`}
+                aria-label={`${copy.gallery.open} ${item.alt}`}
+              >
+                <Picture
+                  src={item.src}
+                  alt={item.alt}
+                  formats={["avif", "webp"]}
+                  fallbackFormat="webp"
+                  widths={thumbWidths}
+                  sizes={thumbSizes}
+                  quality={72}
+                  loading="lazy"
+                  decoding="async"
+                  class="block h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </flora-gallery>
   </div>
+
+  <Lightbox />
 </section>
+
+<style>
+  .flora-chips {
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+  .flora-chips::-webkit-scrollbar {
+    display: none;
+  }
+  .flora-chip {
+    flex: none;
+    scroll-snap-align: start;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border-radius: 999px;
+    border: 1px solid rgb(58 51 48 / 0.18);
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      border-color 0.2s;
+  }
+  .flora-chip:hover {
+    border-color: var(--color-rose-ink);
+  }
+  .flora-chip[aria-pressed="true"] {
+    background: var(--color-rose-ink);
+    border-color: var(--color-rose-ink);
+    color: var(--color-cream);
+  }
+  .flora-gallery-grid {
+    transition: opacity 0.18s ease;
+  }
+  .flora-gallery-grid.is-filtering {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  class FloraGallery extends HTMLElement {
+    connectedCallback() {
+      const grid = this.querySelector<HTMLElement>(".flora-gallery-grid");
+      const bar = this.querySelector<HTMLElement>("[role=group]");
+      const chips = [...this.querySelectorAll<HTMLButtonElement>("[data-filter]")];
+      if (!grid || !bar) return;
+      const tiles = [...grid.children] as HTMLElement[];
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const apply = (filter: string) => {
+        for (const li of tiles) li.hidden = filter !== "*" && li.dataset.category !== filter;
+      };
+
+      for (const chip of chips) {
+        chip.addEventListener("click", () => {
+          if (chip.getAttribute("aria-pressed") === "true") return;
+          for (const c of chips) c.setAttribute("aria-pressed", String(c === chip));
+
+          // Keep the chips where the thumb is: if the bar is stuck, bring the
+          // grid top back under it so a shorter result can't strand the viewport.
+          const barBottom = bar.getBoundingClientRect().bottom;
+          const gridTop = grid.getBoundingClientRect().top;
+          const realign = gridTop < barBottom - 1;
+
+          const swap = () => {
+            apply(chip.dataset.filter ?? "*");
+            if (realign) {
+              window.scrollTo({ top: window.scrollY + grid.getBoundingClientRect().top - barBottom - 8, behavior: "instant" });
+            }
+            grid.classList.remove("is-filtering");
+          };
+
+          if (reduced) return swap();
+          grid.classList.add("is-filtering");
+          setTimeout(swap, 180);
+        });
+      }
+    }
+  }
+
+  customElements.define("flora-gallery", FloraGallery);
+</script>

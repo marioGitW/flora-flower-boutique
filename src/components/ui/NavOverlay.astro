@@ -1,99 +1,181 @@
 ---
 import { site } from "../../data/site";
 import { copy } from "../../data/copy";
+import ContactIcon from "./ContactIcon.astro";
 
-const links = copy.nav.links;
+const t = copy.nav;
 ---
 
-<header
-  class="fixed top-0 inset-x-0 z-50 transition-colors duration-300"
-  id="flora-header"
->
-  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-    <a href="/" class="font-display text-xl text-ink" aria-label={copy.nav.home}>
+<header id="flora-header" class="fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow] duration-300 lg:bg-cream/90 lg:backdrop-blur-sm">
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4">
+    <a href="#pocetok" class="font-display text-2xl text-ink" aria-label={t.home} data-nav-logo>
       {site.name}
     </a>
-    <nav class="hidden md:flex items-center gap-6" aria-label={copy.nav.label}>
-      {links.map((link) => (
-        <a
-          href={link.href}
-          class="text-sm text-ink/80 hover:text-rose-deep transition-colors"
-        >
-          {link.label}
-        </a>
+
+    <nav class="hidden items-center gap-6 md:flex" aria-label={t.label}>
+      {t.links.map((link) => (
+        <a href={link.href} class="text-[0.9375rem] text-ink/85 transition-colors hover:text-rose-ink">{link.label}</a>
       ))}
     </nav>
+
+    <a
+      href={site.phoneHref}
+      class="hidden min-h-10 items-center gap-2 rounded-full bg-rose-ink px-4 text-sm font-medium text-cream transition-colors hover:bg-rose-ink-hover md:inline-flex"
+    >
+      <ContactIcon name="phone" size={16} />
+      {t.headerCall} {site.phoneFormatted}
+    </a>
+
     <button
-      class="relative z-50 flex h-10 w-10 items-center justify-center md:hidden"
-      aria-label={copy.nav.open}
+      type="button"
+      class="js-only relative z-50 -mr-2 flex h-11 w-11 items-center justify-center rounded-full md:hidden"
+      aria-label={t.open}
       aria-expanded="false"
+      aria-controls="flora-nav-overlay"
+      data-label-open={t.open}
+      data-label-close={t.close}
       id="flora-menu-toggle"
     >
-      <span class="flora-hamburger-line absolute h-0.5 w-5 bg-ink transition-transform duration-300" style="transform: translateY(-5px);"></span>
-      <span class="flora-hamburger-line absolute h-0.5 w-5 bg-ink transition-opacity duration-300"></span>
-      <span class="flora-hamburger-line absolute h-0.5 w-5 bg-ink transition-transform duration-300" style="transform: translateY(5px);"></span>
+      <span class="flora-burger" aria-hidden="true"><span></span><span></span><span></span></span>
     </button>
   </div>
 
-  <!-- Mobile overlay -->
   <div
-    class="fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-cream/98 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"
     id="flora-nav-overlay"
+    class="flora-nav-overlay fixed inset-0 z-40 flex flex-col items-center justify-center gap-7 bg-cream md:hidden"
+    inert
   >
-    {links.map((link) => (
-      <a
-        href={link.href}
-        class="flora-nav-link font-display text-3xl text-ink hover:text-rose-deep transition-colors"
-      >
-        {link.label}
-      </a>
-    ))}
-    <a
-      href={site.phoneHref}
-      class="mt-4 text-base text-rose-deep font-medium"
-    >
-      {site.phoneFormatted}
+    <nav aria-label={t.label}>
+      <ul class="flex flex-col items-center gap-5" role="list">
+        {t.links.map((link) => (
+          <li>
+            <a href={link.href} class="flora-nav-link font-display text-3xl text-ink transition-colors hover:text-rose-ink">
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <a href={site.phoneHref} class="flora-nav-link mt-2 inline-flex min-h-12 items-center gap-2 rounded bg-rose-ink px-6 text-base font-medium text-cream">
+      <ContactIcon name="phone" />
+      {copy.hero.callLabel} {site.phoneFormatted}
     </a>
   </div>
 </header>
 
+<style>
+  .flora-burger {
+    position: relative;
+    width: 22px;
+    height: 14px;
+  }
+  .flora-burger span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    border-radius: 2px;
+    background: var(--color-ink);
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.2s;
+  }
+  .flora-burger span:nth-child(1) {
+    top: 0;
+  }
+  .flora-burger span:nth-child(2) {
+    top: 6.25px;
+  }
+  .flora-burger span:nth-child(3) {
+    top: 12.5px;
+  }
+  [aria-expanded="true"] .flora-burger span:nth-child(1) {
+    transform: translateY(6.25px) rotate(45deg);
+  }
+  [aria-expanded="true"] .flora-burger span:nth-child(2) {
+    opacity: 0;
+  }
+  [aria-expanded="true"] .flora-burger span:nth-child(3) {
+    transform: translateY(-6.25px) rotate(-45deg);
+  }
+  /* Visible at once on open (so focus can land), hidden only after the fade on close. */
+  .flora-nav-overlay {
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      opacity 0.3s ease,
+      visibility 0s linear 0.3s;
+  }
+  .flora-nav-overlay.is-open {
+    visibility: visible;
+    opacity: 1;
+    transition:
+      opacity 0.3s ease,
+      visibility 0s linear 0s;
+  }
+  #flora-header.is-scrolled {
+    background-color: rgb(251 247 242 / 0.95);
+    box-shadow: 0 1px 0 rgb(58 51 48 / 0.06);
+  }
+</style>
+
 <script>
+  import { trapTab } from "../../scripts/focus-trap";
+
   const header = document.getElementById("flora-header")!;
-  const toggle = document.getElementById("flora-menu-toggle")!;
+  const toggle = document.getElementById("flora-menu-toggle") as HTMLButtonElement;
   const overlay = document.getElementById("flora-nav-overlay")!;
-  const lines = toggle.querySelectorAll<HTMLElement>(".flora-hamburger-line");
-  let isOpen = false;
+  const logo = header.querySelector<HTMLElement>("[data-nav-logo]")!;
+  const links = [...overlay.querySelectorAll<HTMLAnchorElement>("a")];
+  let open = false;
+  // Elements we made inert on open — others (e.g. a tucked sticky bar) keep their own state.
+  let madeInert: Element[] = [];
 
-  function setOpen(open: boolean) {
-    isOpen = open;
+  // Everything outside the header, plus the logo hidden under the overlay.
+  const outside = () => [...document.body.children].filter((el) => el !== header).concat(logo);
+
+  function setOpen(next: boolean, { restoreFocus = true } = {}) {
+    if (next === open) return;
+    open = next;
     toggle.setAttribute("aria-expanded", String(open));
-    overlay.classList.toggle("opacity-0", !open);
-    overlay.classList.toggle("pointer-events-none", !open);
-    document.body.style.overflow = open ? "hidden" : "";
-
+    toggle.setAttribute("aria-label", (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) ?? "");
+    overlay.classList.toggle("is-open", open);
+    overlay.toggleAttribute("inert", !open);
     if (open) {
-      lines[0].style.transform = "rotate(45deg)";
-      lines[1].style.opacity = "0";
-      lines[2].style.transform = "rotate(-45deg)";
+      madeInert = outside().filter((el) => !el.hasAttribute("inert"));
+      for (const el of madeInert) el.setAttribute("inert", "");
     } else {
-      lines[0].style.transform = "translateY(-5px)";
-      lines[1].style.opacity = "1";
-      lines[2].style.transform = "translateY(5px)";
+      for (const el of madeInert) el.removeAttribute("inert");
+      madeInert = [];
     }
+    document.documentElement.classList.toggle("scroll-lock", open);
+
+    if (open) links[0]?.focus();
+    else if (restoreFocus) toggle.focus();
   }
 
-  toggle.addEventListener("click", () => setOpen(!isOpen));
+  toggle.addEventListener("click", () => setOpen(!open));
 
-  overlay.querySelectorAll(".flora-nav-link").forEach((link) => {
-    link.addEventListener("click", () => setOpen(false));
+  // Following a link: close, but let focus travel with the navigation.
+  for (const link of links) link.addEventListener("click", () => setOpen(false, { restoreFocus: false }));
+
+  document.addEventListener("keydown", (e) => {
+    if (!open) return;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setOpen(false);
+      return;
+    }
+    // Header holds the toggle and the overlay; the logo under it is inert.
+    trapTab(header, e);
   });
 
-  let lastScroll = 0;
-  window.addEventListener("scroll", () => {
-    const y = window.scrollY;
-    header.classList.toggle("bg-cream/95", y > 60);
-    header.classList.toggle("backdrop-blur-sm", y > 60);
-    header.classList.toggle("shadow-sm", y > 60);
-    lastScroll = y;
-  }, { passive: true });
+  // Closing the menu if the viewport grows past the mobile breakpoint.
+  matchMedia("(min-width: 768px)").addEventListener("change", (e) => {
+    if (e.matches) setOpen(false, { restoreFocus: false });
+  });
+
+  const onScroll = () => header.classList.toggle("is-scrolled", window.scrollY > 24);
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
 </script>

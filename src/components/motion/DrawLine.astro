@@ -1,74 +1,137 @@
 ---
 interface Props {
   class?: string;
-  width?: number;
-  height?: number;
+  variant?: "curve" | "botanical";
+  /** Delay before drawing starts, ms. */
+  delay?: number;
 }
 
-const { class: className = "", width = 200, height = 40 } = Astro.props;
+const { class: className = "", variant = "curve", delay = 0 } = Astro.props;
+
+type Pt = [number, number];
+type Seg = [Pt, Pt, Pt, Pt];
+
+const bez = ([p0, p1, p2, p3]: Seg, t: number): Pt => {
+  const u = 1 - t;
+  const f = (i: 0 | 1) => u * u * u * p0[i] + 3 * u * u * t * p1[i] + 3 * u * t * t * p2[i] + t * t * t * p3[i];
+  return [f(0), f(1)];
+};
+const tangent = ([p0, p1, p2, p3]: Seg, t: number) => {
+  const u = 1 - t;
+  const d = (i: 0 | 1) => 3 * u * u * (p1[i] - p0[i]) + 6 * u * t * (p2[i] - p1[i]) + 3 * t * t * (p3[i] - p2[i]);
+  return (Math.atan2(d(1), d(0)) * 180) / Math.PI;
+};
+const segPath = (s: Seg) => `M${s[0].join(",")} C${s[1].join(",")} ${s[2].join(",")} ${s[3].join(",")}`;
+
+let viewBox = "0 0 200 40";
+let stem = "";
+let leaves: { d: string; delay: number; transform: string }[] = [];
+
+if (variant === "botanical") {
+  viewBox = "0 0 240 48";
+  const a: Seg = [[4, 28], [60, 10], [90, 42], [120, 24]];
+  const b: Seg = [[120, 24], [150, 6], [190, 42], [236, 22]];
+  stem = `${segPath(a)} ${segPath(b).replace("M120,24 ", "")}`;
+
+  const leaf = "M0,0 C4,-6 12,-7 17,-3 C12,1 5,2 0,0Z";
+  const spots: [Seg, number, 1 | -1][] = [
+    [a, 0.3, -1],
+    [a, 0.62, 1],
+    [b, 0.38, -1],
+    [b, 0.7, 1],
+  ];
+  leaves = spots.map(([seg, t, side], i) => {
+    const [x, y] = bez(seg, t);
+    const angle = tangent(seg, t) + side * 48;
+    return {
+      d: leaf,
+      delay: 350 + i * 120,
+      transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${angle.toFixed(1)})${side === 1 ? " scale(1 -1)" : ""}`,
+    };
+  });
+} else {
+  stem = "M0,20 C50,6 100,34 200,20";
+}
 ---
 
-<flora-draw-line class={`block ${className}`}>
-  <svg
-    viewBox={`0 0 ${width} ${height}`}
-    width={width}
-    height={height}
-    fill="none"
-    aria-hidden="true"
-    class="w-full h-auto"
-  >
+<flora-draw-line class={`block ${className}`} style={`--flora-draw-delay: ${delay}ms`}>
+  <svg viewBox={viewBox} fill="none" aria-hidden="true" class="h-auto w-full overflow-visible">
     <path
-      d={`M0,${height / 2} C${width * 0.25},${height * 0.15} ${width * 0.5},${height * 0.85} ${width},${height / 2}`}
+      d={stem}
+      pathLength="1"
       stroke="var(--color-sage)"
       stroke-width="1.5"
       stroke-linecap="round"
       class="flora-draw-path"
     />
+    {leaves.map((l) => (
+      <path
+        d={l.d}
+        transform={l.transform}
+        pathLength="1"
+        stroke="var(--color-sage)"
+        stroke-width="1.25"
+        stroke-linejoin="round"
+        class="flora-draw-path"
+        style={`--flora-leaf-delay: ${l.delay}ms`}
+      />
+    ))}
+    {variant === "botanical" && (
+      <g class="flora-draw-bud" transform="translate(120 24)">
+        <circle r="3.2" fill="var(--color-blush)" stroke="var(--color-rose)" stroke-width="1" />
+      </g>
+    )}
   </svg>
 </flora-draw-line>
 
-<script>
-  class FloraDrawLine extends HTMLElement {
-    static observer: IntersectionObserver;
-
-    static {
-      if (typeof window !== "undefined") {
-        const prefersReduced = window.matchMedia(
-          "(prefers-reduced-motion: reduce)",
-        ).matches;
-
-        FloraDrawLine.observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (!entry.isIntersecting) return;
-
-              const el = entry.target as FloraDrawLine;
-              const path = el.querySelector(".flora-draw-path") as SVGPathElement;
-              if (!path) return;
-
-              const length = path.getTotalLength();
-
-              if (prefersReduced) {
-                path.style.strokeDasharray = "none";
-                path.style.strokeDashoffset = "0";
-              } else {
-                path.style.strokeDasharray = `${length}`;
-                path.style.strokeDashoffset = `${length}`;
-                path.style.setProperty("--flora-dash-length", `${length}`);
-                path.style.animation =
-                  "flora-draw-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards";
-              }
-
-              FloraDrawLine.observer.unobserve(el);
-            });
-          },
-          { threshold: 0.3 },
-        );
-      }
+<style>
+  /* Drawn by default (no JS, reduced motion); hidden only when JS will draw it. */
+  :global(.js) flora-draw-line :global(.flora-draw-path) {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  :global(.js) flora-draw-line :global(.flora-draw-bud) {
+    opacity: 0;
+  }
+  flora-draw-line[data-drawn] :global(.flora-draw-path) {
+    --flora-dash-length: 1;
+    animation: flora-draw-in 1.4s cubic-bezier(0.22, 1, 0.36, 1)
+      calc(var(--flora-draw-delay, 0ms) + var(--flora-leaf-delay, 0ms)) forwards;
+  }
+  flora-draw-line[data-drawn] :global(.flora-draw-bud) {
+    animation: flora-fade-rise 0.6s ease-out calc(var(--flora-draw-delay, 0ms) + 700ms) forwards;
+    --flora-rise-distance: 0px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) flora-draw-line :global(.flora-draw-path) {
+      stroke-dashoffset: 0;
+      animation: none !important;
     }
+    :global(.js) flora-draw-line :global(.flora-draw-bud) {
+      opacity: 1;
+      animation: none !important;
+    }
+  }
+</style>
 
+<script>
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        (entry.target as HTMLElement).dataset.drawn = "";
+        observer.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.4 },
+  );
+
+  class FloraDrawLine extends HTMLElement {
     connectedCallback() {
-      FloraDrawLine.observer.observe(this);
+      observer.observe(this);
+    }
+    disconnectedCallback() {
+      observer.unobserve(this);
     }
   }
 

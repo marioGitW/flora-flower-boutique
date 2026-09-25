@@ -1,60 +1,106 @@
 ---
+import { Picture, Image } from "astro:assets";
 import { site } from "../../data/site";
 import { copy } from "../../data/copy";
+import { images } from "../../data/images";
 import PetalField from "../motion/PetalField.astro";
 import Reveal from "../motion/Reveal.astro";
-import BloomSvg from "../motion/BloomSvg.astro";
 import ContactIcon from "../ui/ContactIcon.astro";
 ---
 
-<section class="relative min-h-[85dvh] flex items-center overflow-hidden bg-cream" aria-label="Почетна">
-  <PetalField count={10} />
+<section
+  id="pocetok"
+  class="flora-hero relative isolate flex min-h-[92svh] items-center overflow-hidden lg:min-h-[100svh]"
+  aria-labelledby="hero-title"
+>
+  {/* Photo: full-bleed behind the text on mobile, right-hand bleed from lg. */}
+  <div class="flora-hero-media absolute inset-0 -z-10 lg:left-1/2">
+    <Picture
+      src={images.hero}
+      alt=""
+      formats={["avif", "webp"]}
+      fallbackFormat="webp"
+      widths={[390, 560, 741]}
+      sizes="(min-width: 1024px) 50vw, 100vw"
+      quality={70}
+      loading="eager"
+      fetchpriority="high"
+      class="h-full w-full object-cover object-[50%_30%]"
+    />
+    {/* Warm cream veil keeps text AA over the photo on mobile; on desktop the text sits on plain cream. */}
+    <div class="flora-hero-veil absolute inset-0 lg:hidden" aria-hidden="true"></div>
+  </div>
 
-  <div class="relative z-10 mx-auto max-w-6xl px-4 py-20 text-center">
-    <Reveal>
-      <BloomSvg size={64} petalCount={6} class="mx-auto mb-6" />
-    </Reveal>
+  <PetalField count={8} class="opacity-60 lg:right-1/2" />
 
-    <Reveal delay={100}>
-      <h1 class="font-display text-5xl md:text-6xl text-ink leading-tight">
-        {site.name}
-      </h1>
-    </Reveal>
+  <div class="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-24 lg:grid lg:grid-cols-2 lg:pb-24 lg:pt-28">
+    <div class="mx-auto max-w-md text-center lg:mx-0 lg:max-w-lg lg:pr-12 lg:text-left">
+      <Reveal>
+        <Image
+          src={images.logo}
+          alt=""
+          widths={[112, 224, 336]}
+          sizes="112px"
+          width={112}
+          height={112}
+          format="webp"
+          quality={80}
+          loading="eager"
+          class="mx-auto mb-2 h-28 w-28 lg:mx-0 lg:-ml-2"
+        />
+      </Reveal>
 
-    <Reveal delay={200}>
-      <p class="mt-2 font-display text-lg md:text-xl text-rose-ink">
-        {copy.hero.kind}
-      </p>
-    </Reveal>
+      <Reveal delay={80}>
+        <h1 id="hero-title" class="font-display text-6xl leading-none text-ink lg:text-7xl">
+          {site.name}
+        </h1>
+      </Reveal>
 
-    <Reveal delay={350}>
-      <p class="mx-auto mt-6 max-w-md font-display text-xl text-ink">
-        {site.tagline}
-      </p>
-    </Reveal>
+      <Reveal delay={160}>
+        <p class="mt-3 font-display text-2xl text-rose-ink lg:text-3xl">{copy.hero.kind}</p>
+      </Reveal>
 
-    <Reveal delay={450}>
-      <p class="mx-auto mt-3 max-w-md text-base text-ink/75">
-        {copy.hero.lead}
-      </p>
-    </Reveal>
+      <Reveal delay={240}>
+        <p class="mt-6 font-display text-xl italic leading-snug text-ink lg:text-2xl">
+          {site.tagline}
+        </p>
+      </Reveal>
 
-    <!-- Not wrapped in Reveal: the call/Viber buttons must be usable on first paint, with or without JS. -->
-    <div class="mx-auto mt-8 grid max-w-xs gap-3 sm:max-w-lg sm:grid-cols-2">
-      <a
-        href={site.phoneHref}
-        class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-rose-ink px-5 py-3 text-base font-medium text-cream transition-colors hover:bg-rose-ink-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-ink"
-      >
-        <ContactIcon name="phone" />
-        {copy.hero.callLabel} {site.phoneFormatted}
-      </a>
-      <a
-        href={site.viberHref}
-        class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-viber px-5 py-3 text-base font-medium text-cream transition-colors hover:bg-viber-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-viber"
-      >
-        <ContactIcon name="viber" />
-        {copy.hero.viberLabel}
-      </a>
+      <Reveal delay={320}>
+        <p class="mt-3 text-base leading-relaxed text-ink/90 lg:text-lg">{copy.hero.lead}</p>
+      </Reveal>
+
+      {/* Not wrapped in Reveal: the call/Viber buttons must be usable on first paint, with or without JS. */}
+      <div class="mx-auto mt-8 grid max-w-xs gap-3 whitespace-nowrap sm:w-fit sm:max-w-none sm:grid-cols-2 lg:mx-0" data-hero-ctas>
+        <a
+          href={site.phoneHref}
+          class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-rose-ink px-5 py-3 text-base font-medium text-cream shadow-sm transition-colors hover:bg-rose-ink-hover"
+        >
+          <ContactIcon name="phone" />
+          {copy.hero.callLabel} {site.phoneFormatted}
+        </a>
+        <a
+          href={site.viberHref}
+          class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-viber px-5 py-3 text-base font-medium text-cream shadow-sm transition-colors hover:bg-viber-hover"
+        >
+          <ContactIcon name="viber" />
+          {copy.hero.viberLabel}
+        </a>
+      </div>
     </div>
   </div>
 </section>
+
+<style>
+  .flora-hero-veil {
+    background:
+      linear-gradient(
+        to bottom,
+        rgb(251 247 242 / 0.5) 0%,
+        rgb(251 247 242 / 0.8) 30%,
+        rgb(251 247 242 / 0.86) 70%,
+        rgb(251 247 242 / 1) 100%
+      ),
+      rgb(244 221 220 / 0.18);
+  }
+</style>

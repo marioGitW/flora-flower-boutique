@@ -1,0 +1,29 @@
+---
+import Reveal from "../motion/Reveal.astro";
+import DrawLine from "../motion/DrawLine.astro";
+
+interface Props {
+  id: string;
+  title: string;
+  intro?: string;
+  /** Left-align from lg up (editorial two-column sections). */
+  alignLeftLg?: boolean;
+  class?: string;
+}
+
+const { id, title, intro, alignLeftLg = false, class: className = "" } = Astro.props;
+const align = alignLeftLg ? "text-center lg:text-left" : "text-center";
+const lineAlign = alignLeftLg ? "mx-auto lg:mx-0" : "mx-auto";
+---
+
+<div class:list={[align, className]}>
+  <Reveal>
+    <h2 id={id} class="font-display text-4xl leading-tight text-ink md:text-5xl">{title}</h2>
+  </Reveal>
+  <DrawLine variant="botanical" delay={150} class:list={["mt-3 w-40", lineAlign]} />
+  {intro && (
+    <Reveal delay={140}>
+      <p class:list={["mt-5 max-w-md text-lg leading-relaxed text-ink/80", lineAlign]}>{intro}</p>
+    </Reveal>
+  )}
+</div>

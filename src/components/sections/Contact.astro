@@ -2,81 +2,76 @@
 import { site } from "../../data/site";
 import { copy } from "../../data/copy";
 import Reveal from "../motion/Reveal.astro";
-import DrawLine from "../motion/DrawLine.astro";
+import SectionHeading from "../ui/SectionHeading.astro";
+import ContactIcon from "../ui/ContactIcon.astro";
 
 const t = copy.contact;
-const linkClass = "inline-block text-rose-ink underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-ink";
+
+type Row = {
+  icon: "phone" | "viber" | "whatsapp" | "instagram" | "pin";
+  label: string;
+  value: string;
+  href: string;
+  external?: boolean;
+};
+
+const rows: Row[] = [
+  { icon: "phone", label: t.phoneLabel, value: site.phoneFormatted, href: site.phoneHref },
+  { icon: "viber", label: t.viber, value: t.viberAction, href: site.viberHref },
+  { icon: "whatsapp", label: t.whatsapp, value: t.whatsappAction, href: site.whatsappHref, external: true },
+  { icon: "instagram", label: t.instagram, value: site.instagram, href: site.instagramUrl, external: true },
+  { icon: "pin", label: t.addressLabel, value: site.address.full, href: site.mapUrl, external: true },
+];
+
+const hours = site.hours?.map((h) => (h.days ? `${h.days}: ${h.time}` : h.time)) ?? [t.hoursPending];
 ---
 
-<section id="kontakt" class="bg-lilac/30 py-16 md:py-24" aria-label={t.heading}>
-  <div class="mx-auto max-w-6xl px-4">
-    <Reveal>
-      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">{t.heading}</h2>
-    </Reveal>
+<section id="kontakt" class="bg-lilac/40 lg:grid lg:grid-cols-2" aria-labelledby="kontakt-title">
+  <div class="px-4 py-20 lg:flex lg:justify-end lg:py-28 lg:pl-8 lg:pr-16">
+    <div class="mx-auto w-full max-w-md lg:mx-0">
+      <SectionHeading id="kontakt-title" title={t.heading} intro={t.intro} alignLeftLg />
 
-    <Reveal delay={100}>
-      <DrawLine class="mx-auto mt-4 max-w-[200px]" />
-    </Reveal>
-
-    <Reveal delay={200}>
-      <p class="mx-auto mt-6 max-w-lg text-center text-ink/75">{t.intro}</p>
-    </Reveal>
-
-    <div class="mt-12 mx-auto grid max-w-3xl gap-8 md:grid-cols-2">
       <Reveal delay={200}>
-        <div>
-          <h3 class="font-display text-xl text-ink">{t.addressLabel}</h3>
-          <address class="mt-2 not-italic">
-            <a href={site.mapUrl} target="_blank" rel="noopener noreferrer" class={linkClass}>
-              {site.address.full}
-            </a>
-          </address>
-
-          <h3 class="mt-6 font-display text-xl text-ink">{t.phoneLabel}</h3>
-          <a href={site.phoneHref} class={`mt-2 ${linkClass}`}>{site.phoneFormatted}</a>
-
-          <h3 class="mt-6 font-display text-xl text-ink">{t.writeLabel}</h3>
-          <ul class="mt-2 space-y-1">
-            <li><a href={site.viberHref} class={linkClass}>{t.viber}</a></li>
-            <li><a href={site.whatsappHref} target="_blank" rel="noopener noreferrer" class={linkClass}>{t.whatsapp}</a></li>
+        <ul class="mt-10 divide-y divide-ink/10 overflow-hidden rounded-lg bg-cream/80 ring-1 ring-ink/5" role="list">
+          {rows.map((r) => (
             <li>
-              <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class={linkClass}>
-                {t.instagram} {site.instagram}
+              <a
+                href={r.href}
+                {...(r.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                class="group flex min-h-14 items-center gap-4 px-4 py-3 transition-colors hover:bg-white/70"
+              >
+                <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-blush text-rose-ink">
+                  <ContactIcon name={r.icon} size={20} />
+                </span>
+                <span class="min-w-0">
+                  <span class="block text-sm text-ink/75">{r.label}</span>
+                  <span class="block font-medium text-ink group-hover:text-rose-ink">{r.value}</span>
+                </span>
               </a>
             </li>
-          </ul>
-
-          <h3 class="mt-6 font-display text-xl text-ink">{t.hoursLabel}</h3>
-          {site.hours ? (
-            <ul class="mt-2 text-ink/80">
-              {site.hours.map((h) => (
-                <li>{h.days && `${h.days}: `}{h.time}</li>
-              ))}
-            </ul>
-          ) : (
-            <p class="mt-2 text-ink/75">{t.hoursPending}</p>
-          )}
-        </div>
-      </Reveal>
-
-      <Reveal delay={300}>
-        <div class="overflow-hidden rounded-lg">
-          <a
-            href={site.mapUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex aspect-[4/3] items-center justify-center bg-mint/40 text-sm text-ink/75 transition-colors hover:bg-mint/60"
-          >
-            <span class="text-center">
-              <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
-                <circle cx="12" cy="9" r="2.5" />
-              </svg>
-              {t.mapOpen}
+          ))}
+          <li class="flex min-h-14 items-center gap-4 px-4 py-3">
+            <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-butter text-ink/80">
+              <ContactIcon name="clock" size={20} />
             </span>
-          </a>
-        </div>
+            <span>
+              <span class="block text-sm text-ink/75">{t.hoursLabel}</span>
+              {hours.map((h) => <span class="block font-medium text-ink">{h}</span>)}
+            </span>
+          </li>
+        </ul>
       </Reveal>
     </div>
+  </div>
+
+  <div class="relative aspect-[4/3] w-full bg-mint/60 lg:aspect-auto lg:min-h-[36rem]">
+    <iframe
+      src={site.mapEmbedUrl}
+      title={t.mapTitle}
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen
+      class="absolute inset-0 h-full w-full border-0"
+    ></iframe>
   </div>
 </section>
