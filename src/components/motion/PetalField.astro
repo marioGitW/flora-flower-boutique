@@ -35,7 +35,6 @@ const petals = Array.from({ length: clampedCount }, (_, i) => {
         animation: flora-petal-drift ${p.duration} ${p.delay} linear infinite;
         --flora-drift-x: ${p.driftX};
         --flora-drift-rot: ${p.driftRot};
-        will-change: transform, opacity;
       `}
       viewBox="0 0 24 24"
       fill={p.color}

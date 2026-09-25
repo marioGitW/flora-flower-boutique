@@ -16,8 +16,11 @@ import { copy } from "../data/copy";
   <NavOverlay />
 
   <main>
-    <Hero />
-    <Services />
+    {/* Sticky range for the hero photo: Services slides up over it. */}
+    <div class="relative">
+      <Hero />
+      <Services />
+    </div>
     <Gallery />
     <HowToOrder />
     <About />

@@ -14,7 +14,7 @@ const {
   class: className = "",
   stagger = 0,
   delay = 0,
-  distance = 20,
+  distance = 16,
   fill = false,
 } = Astro.props;
 ---
@@ -49,10 +49,10 @@ const {
 
               const stagger = Number(el.dataset.stagger) || 0;
               const delay = Number(el.dataset.delay) || 0;
-              const distance = Number(el.dataset.distance) || 20;
+              const distance = Number(el.dataset.distance) || 16;
 
               child.style.setProperty("--flora-rise-distance", `${distance}px`);
-              child.style.animation = `flora-fade-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay + stagger}ms both`;
+              child.style.animation = `flora-fade-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${delay + stagger}ms both`;
 
               FloraReveal.observer.unobserve(el);
             });

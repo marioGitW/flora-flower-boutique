@@ -7,6 +7,7 @@ import Reveal from "../motion/Reveal.astro";
 import BloomSvg from "../motion/BloomSvg.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import OrderSheet from "../ui/OrderSheet.astro";
+import SectionDivider from "../ui/SectionDivider.astro";
 
 const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
 const gallery = await getCollection("gallery");
@@ -26,7 +27,8 @@ const cards = services.map((s, i) => ({
 }));
 ---
 
-<section id="uslugi" class="bg-cream py-20 lg:py-28" aria-labelledby="uslugi-title">
+<section id="uslugi" class="relative z-10 rounded-t-[1.75rem] bg-cream pb-20 pt-10 shadow-[0_-24px_48px_-24px_rgb(58_51_48/0.25)] lg:pb-28 lg:pt-14" aria-labelledby="uslugi-title">
+  <SectionDivider bloom class="mb-10 lg:mb-14" />
   <div class="mx-auto max-w-6xl px-4">
     <div class="lg:flex lg:items-end lg:justify-between lg:gap-12">
       <SectionHeading id="uslugi-title" title={copy.services.heading} alignLeftLg />

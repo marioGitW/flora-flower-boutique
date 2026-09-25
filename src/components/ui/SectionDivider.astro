@@ -1,0 +1,19 @@
+---
+import DrawLine from "../motion/DrawLine.astro";
+import BloomSvg from "../motion/BloomSvg.astro";
+
+interface Props {
+  /** Put a bloom in the middle that opens once when the divider enters. */
+  bloom?: boolean;
+  class?: string;
+}
+
+const { bloom = false, class: className = "" } = Astro.props;
+---
+
+{/* Two vines growing out from the centre, mirrored. Decorative only. */}
+<div class:list={["flex items-center justify-center gap-1", className]} aria-hidden="true">
+  <DrawLine variant="botanical" class="w-28 -scale-x-100 sm:w-40" />
+  {bloom ? <BloomSvg size={36} petalCount={6} class="flex-none" /> : <span class="h-1.5 w-1.5 flex-none rounded-full bg-sage/70"></span>}
+  <DrawLine variant="botanical" class="w-28 sm:w-40" />
+</div>

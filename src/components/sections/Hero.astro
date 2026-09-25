@@ -8,13 +8,14 @@ import Reveal from "../motion/Reveal.astro";
 import ContactIcon from "../ui/ContactIcon.astro";
 ---
 
-<section
-  id="pocetok"
-  class="flora-hero relative isolate flex min-h-[92svh] items-center overflow-hidden lg:min-h-[100svh]"
-  aria-labelledby="hero-title"
->
-  {/* Photo: full-bleed behind the text on mobile, right-hand bleed from lg. */}
-  <div class="flora-hero-media absolute inset-0 -z-10 lg:left-1/2">
+{/*
+  The photo is its own sticky layer, outside the section: it stays pinned while the
+  hero text scrolls away at normal speed (no parallax on text) and the next section
+  slides up over it. Its sticky range is the wrapper around Hero + Services in
+  index.astro. Full-bleed on mobile, right-hand bleed from lg.
+*/}
+<div class="flora-hero-media sticky top-0 z-0 -mb-[100svh] h-[100svh] overflow-hidden" data-hero-media>
+  <div class="flora-hero-zoom absolute inset-0 lg:left-1/2">
     <Picture
       src={images.hero}
       alt=""
@@ -29,8 +30,16 @@ import ContactIcon from "../ui/ContactIcon.astro";
     />
     {/* Warm cream veil keeps text AA over the photo on mobile; on desktop the text sits on plain cream. */}
     <div class="flora-hero-veil absolute inset-0 lg:hidden" aria-hidden="true"></div>
+    {/* Inside the zoom layer so it recedes with the photo instead of framing it. */}
+    <div class="flora-hero-shade absolute inset-0 bg-ink opacity-0" aria-hidden="true"></div>
   </div>
+</div>
 
+<section
+  id="pocetok"
+  class="flora-hero relative z-10 flex min-h-[92svh] items-center overflow-hidden lg:min-h-[100svh]"
+  aria-labelledby="hero-title"
+>
   <PetalField count={8} class="opacity-60 lg:right-1/2" />
 
   <div class="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-24 lg:grid lg:grid-cols-2 lg:pb-24 lg:pt-28">
@@ -92,6 +101,37 @@ import ContactIcon from "../ui/ContactIcon.astro";
 </section>
 
 <style>
+  .flora-hero-zoom {
+    transform-origin: 50% 35%;
+  }
+
+  /* Scroll-linked recede: transform/opacity only, driven by the compositor where supported. */
+  @keyframes flora-hero-recede {
+    to {
+      transform: scale(0.92);
+    }
+  }
+  @keyframes flora-hero-shade {
+    to {
+      opacity: 0.45;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      .flora-hero-zoom {
+        animation: flora-hero-recede linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 100svh;
+      }
+      /* Darkening starts a little later so text still on screen keeps its contrast. */
+      .flora-hero-shade {
+        animation: flora-hero-shade linear both;
+        animation-timeline: scroll(root);
+        animation-range: 25svh 100svh;
+      }
+    }
+  }
+
   .flora-hero-veil {
     background:
       linear-gradient(
@@ -104,3 +144,41 @@ import ContactIcon from "../ui/ContactIcon.astro";
       rgb(244 221 220 / 0.18);
   }
 </style>
+
+<script>
+  // Fallback for browsers without scroll-driven animations: same effect via rAF,
+  // listening to scroll only while the photo is on screen.
+  const media = document.querySelector<HTMLElement>("[data-hero-media]");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (media && !reduced && !CSS.supports("animation-timeline: scroll()")) {
+    const zoom = media.querySelector<HTMLElement>(".flora-hero-zoom")!;
+    const shade = media.querySelector<HTMLElement>(".flora-hero-shade")!;
+    let queued = false;
+
+    const update = () => {
+      queued = false;
+      const vh = window.innerHeight;
+      const clamp = (v: number) => Math.min(1, Math.max(0, v));
+      const p = clamp(window.scrollY / vh);
+      const q = clamp((window.scrollY - 0.25 * vh) / (0.75 * vh));
+      zoom.style.transform = `scale(${1 - 0.08 * p})`;
+      shade.style.opacity = String(0.45 * q);
+    };
+    const onScroll = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        window.addEventListener("scroll", onScroll, { passive: true });
+        update();
+      } else {
+        window.removeEventListener("scroll", onScroll);
+      }
+    }).observe(media);
+  }
+</script>
