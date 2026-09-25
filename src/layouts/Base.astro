@@ -1,0 +1,69 @@
+---
+import "@fontsource-variable/playfair-display";
+import "@fontsource-variable/playfair-display/wght-italic.css";
+import "@fontsource-variable/inter";
+import "../styles/global.css";
+import { site } from "../data/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = site.meta.title, description = site.meta.description } =
+  Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Florist",
+  name: site.nameFull,
+  alternateName: site.nameEn,
+  description: description,
+  url: Astro.site?.toString(),
+  telephone: `+389${site.phone}`,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: site.address.street,
+    addressLocality: site.address.city,
+    addressCountry: "MK",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: site.geo.lat,
+    longitude: site.geo.lng,
+  },
+  sameAs: [site.instagramUrl],
+  image: `${Astro.site}og-image.png`,
+};
+---
+
+<!doctype html>
+<html lang="mk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${Astro.site}og-image.png`} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:locale" content="mk_MK" />
+    <meta property="og:site_name" content={site.nameFull} />
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body class="min-h-dvh bg-cream text-ink font-body antialiased">
+    <slot />
+  </body>
+</html>

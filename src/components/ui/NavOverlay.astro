@@ -1,0 +1,104 @@
+---
+import { site } from "../../data/site";
+
+const links = [
+  { href: "#uslugi", label: "Услуги" },
+  { href: "#galerija", label: "Галерија" },
+  { href: "#kako-naracuvate", label: "Како нарачувате" },
+  { href: "#za-nas", label: "За нас" },
+  { href: "#kontakt", label: "Контакт" },
+];
+---
+
+<header
+  class="fixed top-0 inset-x-0 z-50 transition-colors duration-300"
+  id="flora-header"
+>
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+    <a href="/" class="font-display text-xl text-ink" aria-label={site.nameFull}>
+      Флора
+    </a>
+    <nav class="hidden md:flex items-center gap-6" aria-label="Главна навигација">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class="text-sm text-ink/80 hover:text-rose-deep transition-colors"
+        >
+          {link.label}
+        </a>
+      ))}
+    </nav>
+    <button
+      class="relative z-50 flex h-10 w-10 items-center justify-center md:hidden"
+      aria-label="Мени"
+      aria-expanded="false"
+      id="flora-menu-toggle"
+    >
+      <span class="flora-hamburger-line absolute h-0.5 w-5 bg-ink transition-transform duration-300" style="transform: translateY(-5px);"></span>
+      <span class="flora-hamburger-line absolute h-0.5 w-5 bg-ink transition-opacity duration-300"></span>
+      <span class="flora-hamburger-line absolute h-0.5 w-5 bg-ink transition-transform duration-300" style="transform: translateY(5px);"></span>
+    </button>
+  </div>
+
+  <!-- Mobile overlay -->
+  <div
+    class="fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-cream/98 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"
+    id="flora-nav-overlay"
+  >
+    {links.map((link) => (
+      <a
+        href={link.href}
+        class="flora-nav-link font-display text-3xl text-ink hover:text-rose-deep transition-colors"
+      >
+        {link.label}
+      </a>
+    ))}
+    <a
+      href={site.phoneHref}
+      class="mt-4 text-base text-rose-deep font-medium"
+    >
+      {site.phoneFormatted}
+    </a>
+  </div>
+</header>
+
+<script>
+  const header = document.getElementById("flora-header")!;
+  const toggle = document.getElementById("flora-menu-toggle")!;
+  const overlay = document.getElementById("flora-nav-overlay")!;
+  const lines = toggle.querySelectorAll<HTMLElement>(".flora-hamburger-line");
+  let isOpen = false;
+
+  function setOpen(open: boolean) {
+    isOpen = open;
+    toggle.setAttribute("aria-expanded", String(open));
+    overlay.classList.toggle("opacity-0", !open);
+    overlay.classList.toggle("pointer-events-none", !open);
+    document.body.style.overflow = open ? "hidden" : "";
+
+    if (open) {
+      lines[0].style.transform = "rotate(45deg)";
+      lines[1].style.opacity = "0";
+      lines[2].style.transform = "rotate(-45deg)";
+    } else {
+      lines[0].style.transform = "translateY(-5px)";
+      lines[1].style.opacity = "1";
+      lines[2].style.transform = "translateY(5px)";
+    }
+  }
+
+  toggle.addEventListener("click", () => setOpen(!isOpen));
+
+  overlay.querySelectorAll(".flora-nav-link").forEach((link) => {
+    link.addEventListener("click", () => setOpen(false));
+  });
+
+  let lastScroll = 0;
+  window.addEventListener("scroll", () => {
+    const y = window.scrollY;
+    header.classList.toggle("bg-cream/95", y > 60);
+    header.classList.toggle("backdrop-blur-sm", y > 60);
+    header.classList.toggle("shadow-sm", y > 60);
+    lastScroll = y;
+  }, { passive: true });
+</script>

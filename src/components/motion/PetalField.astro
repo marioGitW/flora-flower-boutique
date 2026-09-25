@@ -1,0 +1,82 @@
+---
+interface Props {
+  count?: number;
+  class?: string;
+}
+
+const { count = 10, class: className = "" } = Astro.props;
+
+const clampedCount = Math.min(Math.max(count, 8), 12);
+
+const petals = Array.from({ length: clampedCount }, (_, i) => {
+  const hue = [0, 1, 2][i % 3]; // 0=rose, 1=blush, 2=butter
+  const colors = ["var(--color-rose)", "var(--color-blush)", "var(--color-butter)"];
+  return {
+    color: colors[hue],
+    left: `${8 + Math.random() * 84}%`,
+    delay: `${Math.random() * 8}s`,
+    duration: `${10 + Math.random() * 6}s`,
+    driftX: `${-40 + Math.random() * 80}px`,
+    driftRot: `${180 + Math.random() * 360}deg`,
+    size: `${12 + Math.random() * 10}px`,
+  };
+});
+---
+
+<flora-petal-field class={`flora-petal-field pointer-events-none absolute inset-0 overflow-hidden ${className}`} aria-hidden="true">
+  {petals.map((p) => (
+    <svg
+      class="flora-petal absolute"
+      style={`
+        left: ${p.left};
+        top: -5%;
+        width: ${p.size};
+        height: ${p.size};
+        animation: flora-petal-drift ${p.duration} ${p.delay} linear infinite;
+        --flora-drift-x: ${p.driftX};
+        --flora-drift-rot: ${p.driftRot};
+        will-change: transform, opacity;
+      `}
+      viewBox="0 0 24 24"
+      fill={p.color}
+    >
+      <ellipse cx="12" cy="10" rx="6" ry="10" opacity="0.6" transform="rotate(15 12 12)" />
+    </svg>
+  ))}
+</flora-petal-field>
+
+<script>
+  class FloraPetalField extends HTMLElement {
+    private observer: IntersectionObserver | null = null;
+
+    connectedCallback() {
+      const prefersReduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      if (prefersReduced) {
+        this.remove();
+        return;
+      }
+
+      this.observer = new IntersectionObserver(
+        ([entry]) => {
+          const petals = this.querySelectorAll<SVGElement>(".flora-petal");
+          petals.forEach((p) => {
+            p.style.animationPlayState = entry.isIntersecting
+              ? "running"
+              : "paused";
+          });
+        },
+        { threshold: 0 },
+      );
+      this.observer.observe(this);
+    }
+
+    disconnectedCallback() {
+      this.observer?.disconnect();
+    }
+  }
+
+  customElements.define("flora-petal-field", FloraPetalField);
+</script>

@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+/* ── Design Tokens ─────────────────────────────────────── */
+
+@theme {
+  /* Palette — derived from Flora brand assets */
+  --color-cream: #FBF7F2;
+  --color-blush: #F4DDDC;
+  --color-mint: #D9E4DA;
+  --color-butter: #F7EBD2;
+  --color-lilac: #E2DAE8;
+  --color-rose: #D98C8C;
+  --color-rose-deep: #B96F6F;
+  --color-gold: #C9A961;
+  --color-sage: #9CAF9C;
+  --color-ink: #3A3330;
+
+  /* Font families */
+  --font-display: "Playfair Display Variable", "Georgia", serif;
+  --font-body: "Inter Variable", "Segoe UI", system-ui, sans-serif;
+
+  /* Type scale */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.625;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1.15;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1.1;
+
+  /* Border radii (12–20px range) */
+  --radius-sm: 12px;
+  --radius: 16px;
+  --radius-lg: 20px;
+}
+
+/* ── Base styles ───────────────────────────────────────── */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background-color: var(--color-cream);
+  font-feature-settings: "locl";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-feature-settings: "locl";
+}
+
+::selection {
+  background-color: var(--color-blush);
+  color: var(--color-ink);
+}
+
+/* ── Motion primitives — shared keyframes ──────────────── */
+
+@keyframes flora-fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes flora-draw-in {
+  from {
+    stroke-dashoffset: var(--flora-dash-length, 1000);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes flora-petal-drift {
+  0% {
+    transform: translate(0, -10%) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(var(--flora-drift-x, 30px), 110vh) rotate(var(--flora-drift-rot, 360deg));
+    opacity: 0;
+  }
+}
+
+@keyframes flora-bloom {
+  from {
+    transform: scale(0) rotate(-30deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* ── Reduced motion ────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .flora-petal-field {
+    display: none !important;
+  }
+}

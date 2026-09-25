@@ -1,0 +1,75 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<flora-lightbox class={className}>
+  <dialog
+    class="flora-lightbox-dialog fixed inset-0 z-50 m-0 h-dvh w-dvw max-h-none max-w-none bg-ink/90 p-4 backdrop:bg-transparent"
+  >
+    <button
+      class="flora-lightbox-close absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-cream/20 text-cream hover:bg-cream/40 transition-colors"
+      aria-label="Затвори"
+    >
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="4" y1="4" x2="16" y2="16" />
+        <line x1="16" y1="4" x2="4" y2="16" />
+      </svg>
+    </button>
+    <div class="flex h-full w-full items-center justify-center">
+      <img
+        class="flora-lightbox-img max-h-full max-w-full object-contain rounded"
+        src=""
+        alt=""
+      />
+    </div>
+  </dialog>
+  <slot />
+</flora-lightbox>
+
+<script>
+  class FloraLightbox extends HTMLElement {
+    private dialog: HTMLDialogElement | null = null;
+    private img: HTMLImageElement | null = null;
+
+    connectedCallback() {
+      this.dialog = this.querySelector(".flora-lightbox-dialog");
+      this.img = this.querySelector(".flora-lightbox-img");
+      const closeBtn = this.querySelector(".flora-lightbox-close");
+
+      this.addEventListener("click", (e) => {
+        const trigger = (e.target as HTMLElement).closest("[data-lightbox-src]");
+        if (!trigger) return;
+        const src = trigger.getAttribute("data-lightbox-src") || "";
+        const alt = trigger.getAttribute("data-lightbox-alt") || "";
+        this.open(src, alt);
+      });
+
+      closeBtn?.addEventListener("click", () => this.close());
+
+      this.dialog?.addEventListener("click", (e) => {
+        if (e.target === this.dialog) this.close();
+      });
+
+      this.dialog?.addEventListener("cancel", () => this.close());
+    }
+
+    open(src: string, alt: string) {
+      if (!this.dialog || !this.img) return;
+      this.img.src = src;
+      this.img.alt = alt;
+      this.dialog.showModal();
+      document.body.style.overflow = "hidden";
+    }
+
+    close() {
+      this.dialog?.close();
+      document.body.style.overflow = "";
+    }
+  }
+
+  customElements.define("flora-lightbox", FloraLightbox);
+</script>

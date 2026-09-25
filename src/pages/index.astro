@@ -1,0 +1,46 @@
+---
+import Base from "../layouts/Base.astro";
+import NavOverlay from "../components/ui/NavOverlay.astro";
+import StickyCallBar from "../components/ui/StickyCallBar.astro";
+import Hero from "../components/sections/Hero.astro";
+import Services from "../components/sections/Services.astro";
+import Gallery from "../components/sections/Gallery.astro";
+import HowToOrder from "../components/sections/HowToOrder.astro";
+import About from "../components/sections/About.astro";
+import Contact from "../components/sections/Contact.astro";
+import { site } from "../data/site";
+---
+
+<Base>
+  <NavOverlay />
+
+  <main>
+    <Hero />
+    <Services />
+    <Gallery />
+    <HowToOrder />
+    <About />
+    <Contact />
+  </main>
+
+  <footer class="bg-ink py-10 text-cream/70">
+    <div class="mx-auto max-w-6xl px-4 text-center">
+      <p class="font-display text-lg text-cream">{site.name}</p>
+      <p class="mt-1 text-sm">{site.tagline}</p>
+      <div class="mt-4 flex items-center justify-center gap-4 text-sm">
+        <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class="hover:text-cream transition-colors">
+          Instagram
+        </a>
+        <span class="text-cream/30">·</span>
+        <a href={site.phoneHref} class="hover:text-cream transition-colors">
+          {site.phoneFormatted}
+        </a>
+      </div>
+      <p class="mt-6 text-xs text-cream/40">
+        &copy; {new Date().getFullYear()} {site.nameFull}
+      </p>
+    </div>
+  </footer>
+
+  <StickyCallBar />
+</Base>

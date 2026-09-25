@@ -1,0 +1,73 @@
+---
+interface Props {
+  as?: string;
+  class?: string;
+  stagger?: number;
+  delay?: number;
+  distance?: number;
+}
+
+const {
+  as: Tag = "div",
+  class: className = "",
+  stagger = 0,
+  delay = 0,
+  distance = 20,
+} = Astro.props;
+---
+
+<flora-reveal
+  data-stagger={stagger}
+  data-delay={delay}
+  data-distance={distance}
+>
+  <Tag class={className} style="opacity: 0;">
+    <slot />
+  </Tag>
+</flora-reveal>
+
+<script>
+  class FloraReveal extends HTMLElement {
+    static observer: IntersectionObserver;
+
+    static {
+      if (typeof window !== "undefined") {
+        const prefersReduced = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+
+        FloraReveal.observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+
+              const el = entry.target as FloraReveal;
+              const child = el.firstElementChild as HTMLElement;
+              if (!child) return;
+
+              const stagger = Number(el.dataset.stagger) || 0;
+              const delay = Number(el.dataset.delay) || 0;
+              const distance = Number(el.dataset.distance) || 20;
+
+              if (prefersReduced) {
+                child.style.opacity = "1";
+              } else {
+                child.style.animation = `flora-fade-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay + stagger}ms forwards`;
+                child.style.setProperty("--flora-rise-distance", `${distance}px`);
+              }
+
+              FloraReveal.observer.unobserve(el);
+            });
+          },
+          { threshold: 0.15, rootMargin: "0px 0px -40px 0px" },
+        );
+      }
+    }
+
+    connectedCallback() {
+      FloraReveal.observer.observe(this);
+    }
+  }
+
+  customElements.define("flora-reveal", FloraReveal);
+</script>

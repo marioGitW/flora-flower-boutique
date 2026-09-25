@@ -1,0 +1,64 @@
+---
+import { site } from "../../data/site";
+import Reveal from "../motion/Reveal.astro";
+import DrawLine from "../motion/DrawLine.astro";
+---
+
+<section id="kontakt" class="bg-lilac/30 py-16 md:py-24" aria-label="Контакт">
+  <div class="mx-auto max-w-6xl px-4">
+    <Reveal>
+      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">Контакт</h2>
+    </Reveal>
+
+    <Reveal delay={100}>
+      <DrawLine class="mx-auto mt-4 max-w-[200px]" />
+    </Reveal>
+
+    <div class="mt-12 mx-auto grid max-w-3xl gap-8 md:grid-cols-2">
+      <Reveal delay={200}>
+        <div>
+          <h3 class="font-display text-xl text-ink">Адреса</h3>
+          <p class="mt-2 text-ink/70">{site.address.full}</p>
+
+          <h3 class="mt-6 font-display text-xl text-ink">Телефон</h3>
+          <a
+            href={site.phoneHref}
+            class="mt-2 inline-block text-rose-deep hover:underline"
+          >
+            {site.phoneFormatted}
+          </a>
+
+          <h3 class="mt-6 font-display text-xl text-ink">Instagram</h3>
+          <a
+            href={site.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mt-2 inline-block text-rose-deep hover:underline"
+          >
+            {site.instagram}
+          </a>
+        </div>
+      </Reveal>
+
+      <Reveal delay={300}>
+        <div class="overflow-hidden rounded-lg">
+          <a
+            href={site.mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="block aspect-[4/3] bg-mint/40 flex items-center justify-center text-ink/40 text-sm hover:bg-mint/60 transition-colors"
+            aria-label="Отвори мапа"
+          >
+            <div class="text-center">
+              <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
+                <circle cx="12" cy="9" r="2.5" />
+              </svg>
+              Отвори на Google Maps
+            </div>
+          </a>
+        </div>
+      </Reveal>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "novorodence",
+    "name": "Подароци за новороденче",
+    "slug": "podaroci-za-novorodence",
+    "description": "Уникатни подароци за добредојде на новиот член на семејството.",
+    "order": 1
+  },
+  {
+    "id": "krstevki",
+    "name": "Крштевки",
+    "slug": "krstevki",
+    "description": "Цветни аранжмани и декорации за крштевки.",
+    "order": 2
+  },
+  {
+    "id": "aranzman-kutija",
+    "name": "Аранжмани во кутија",
+    "slug": "aranzmani-vo-kutija",
+    "description": "Елегантни цветни аранжмани во декоративни кутии.",
+    "order": 3
+  },
+  {
+    "id": "buketi",
+    "name": "Букети",
+    "slug": "buketi",
+    "description": "Рачно изработени букети за секоја прилика.",
+    "order": 4
+  },
+  {
+    "id": "svadbi",
+    "name": "Свадби",
+    "slug": "svadbi",
+    "description": "Комплетна цветна декорација за вашиот најважен ден.",
+    "order": 5
+  },
+  {
+    "id": "rodendeni",
+    "name": "Родендени",
+    "slug": "rodendeni",
+    "description": "Цветни изненадувања за роденденски прослави.",
+    "order": 6
+  },
+  {
+    "id": "matura",
+    "name": "Матура и дипломирање",
+    "slug": "matura-i-diplomiranje",
+    "description": "Букети и аранжмани за матура и дипломирање.",
+    "order": 7
+  },
+  {
+    "id": "svrsuvacki",
+    "name": "Свршувачки и годишнини",
+    "slug": "svrsuvacki-i-godisnini",
+    "description": "Романтични аранжмани за свршувачки и годишнини.",
+    "order": 8
+  },
+  {
+    "id": "dekoracija-avtomobili",
+    "name": "Декорација на автомобили",
+    "slug": "dekoracija-na-avtomobili",
+    "description": "Цветна декорација за свадбени и свечени автомобили.",
+    "order": 9
+  },
+  {
+    "id": "venci",
+    "name": "Венци",
+    "slug": "venci",
+    "description": "Венци за сите пригоди.",
+    "order": 10
+  }
+]

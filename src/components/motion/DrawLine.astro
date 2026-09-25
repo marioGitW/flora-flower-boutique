@@ -1,0 +1,76 @@
+---
+interface Props {
+  class?: string;
+  width?: number;
+  height?: number;
+}
+
+const { class: className = "", width = 200, height = 40 } = Astro.props;
+---
+
+<flora-draw-line class={`block ${className}`}>
+  <svg
+    viewBox={`0 0 ${width} ${height}`}
+    width={width}
+    height={height}
+    fill="none"
+    aria-hidden="true"
+    class="w-full h-auto"
+  >
+    <path
+      d={`M0,${height / 2} C${width * 0.25},${height * 0.15} ${width * 0.5},${height * 0.85} ${width},${height / 2}`}
+      stroke="var(--color-sage)"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      class="flora-draw-path"
+    />
+  </svg>
+</flora-draw-line>
+
+<script>
+  class FloraDrawLine extends HTMLElement {
+    static observer: IntersectionObserver;
+
+    static {
+      if (typeof window !== "undefined") {
+        const prefersReduced = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+
+        FloraDrawLine.observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+
+              const el = entry.target as FloraDrawLine;
+              const path = el.querySelector(".flora-draw-path") as SVGPathElement;
+              if (!path) return;
+
+              const length = path.getTotalLength();
+
+              if (prefersReduced) {
+                path.style.strokeDasharray = "none";
+                path.style.strokeDashoffset = "0";
+              } else {
+                path.style.strokeDasharray = `${length}`;
+                path.style.strokeDashoffset = `${length}`;
+                path.style.setProperty("--flora-dash-length", `${length}`);
+                path.style.animation =
+                  "flora-draw-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards";
+              }
+
+              FloraDrawLine.observer.unobserve(el);
+            });
+          },
+          { threshold: 0.3 },
+        );
+      }
+    }
+
+    connectedCallback() {
+      FloraDrawLine.observer.observe(this);
+    }
+  }
+
+  customElements.define("flora-draw-line", FloraDrawLine);
+</script>

@@ -1,0 +1,73 @@
+---
+import Base from "../layouts/Base.astro";
+
+const specimen = "ЃЌЏЈЉЊЅ ѓќџјљњѕ Аранжмани Свадби Крштевки Подароци за новороденче";
+const alphabet = "АБВГДЃЕЖЗЅИЈКЛЉМНЊОПРСТЌУФХЦЧЏШабвгдѓежзѕијклљмнњопрстќуфхцчџш";
+
+const displayWeights = [400, 500, 600, 700, 800, 900];
+const bodyWeights = [300, 400, 500, 600, 700];
+---
+
+<Base title="Проверка на типографија — Флора">
+  <div class="mx-auto max-w-4xl px-4 py-16">
+    <h1 class="font-display text-3xl text-ink mb-8">Проверка на Кирилица</h1>
+
+    <section class="mb-12">
+      <h2 class="text-xl text-ink/60 mb-4 font-body">
+        Playfair Display Variable (display)
+      </h2>
+      {displayWeights.map((w) => (
+        <div class="mb-4 border-b border-ink/10 pb-4">
+          <p class="text-xs text-ink/40 mb-1">weight {w} normal</p>
+          <p class="font-display text-2xl" style={`font-weight: ${w};`}>
+            {specimen}
+          </p>
+          <p class="font-display text-lg mt-1" style={`font-weight: ${w};`}>
+            {alphabet}
+          </p>
+          <p class="text-xs text-ink/40 mt-3 mb-1">weight {w} italic</p>
+          <p class="font-display text-2xl italic" style={`font-weight: ${w};`}>
+            {specimen}
+          </p>
+          <p class="font-display text-lg italic mt-1" style={`font-weight: ${w};`}>
+            {alphabet}
+          </p>
+        </div>
+      ))}
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-xl text-ink/60 mb-4 font-body">
+        Inter Variable (body)
+      </h2>
+      {bodyWeights.map((w) => (
+        <div class="mb-4 border-b border-ink/10 pb-4">
+          <p class="text-xs text-ink/40 mb-1">weight {w} normal</p>
+          <p class="font-body text-lg" style={`font-weight: ${w};`}>
+            {specimen}
+          </p>
+          <p class="font-body text-base mt-1" style={`font-weight: ${w};`}>
+            {alphabet}
+          </p>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2 class="text-xl text-ink/60 mb-4 font-body">Комбинации</h2>
+      <div class="rounded-lg bg-blush/40 p-6">
+        <h3 class="font-display text-4xl text-ink">Флора</h3>
+        <p class="font-display text-xl text-rose mt-1">Бутик за цвеќе</p>
+        <p class="font-body text-base text-ink/70 mt-3">
+          Вашите моменти, наши цветни инспирации. Подароци за новороденче,
+          крштевки, аранжмани во кутија, букети, свадби, родендени, матура и
+          дипломирање, свршувачки и годишнини, декорација на автомобили, венци.
+        </p>
+      </div>
+    </section>
+
+    <p class="mt-12 text-xs text-ink/30">
+      Ова е страница само за развој — проверете ги глифовите ЃЌЏЈЉЊЅ за локализирана кирилица.
+    </p>
+  </div>
+</Base>

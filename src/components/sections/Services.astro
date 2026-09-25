@@ -1,0 +1,43 @@
+---
+import { getCollection } from "astro:content";
+import Reveal from "../motion/Reveal.astro";
+import DrawLine from "../motion/DrawLine.astro";
+import Card from "../ui/Card.astro";
+
+const services = (await getCollection("services")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<section id="uslugi" class="bg-blush/40 py-16 md:py-24" aria-label="Услуги">
+  <div class="mx-auto max-w-6xl px-4">
+    <Reveal>
+      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">Услуги</h2>
+    </Reveal>
+
+    <Reveal delay={100}>
+      <DrawLine class="mx-auto mt-4 max-w-[200px]" />
+    </Reveal>
+
+    <Reveal delay={200}>
+      <p class="mx-auto mt-6 max-w-lg text-center text-ink/70">
+        Од нежни букети до комплетни свадбени декорации — секој момент заслужува цветна приказна.
+      </p>
+    </Reveal>
+
+    <div class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      {services.map((service, i) => (
+        <Reveal delay={i * 60} stagger={0}>
+          <Card bg="bg-cream" class="p-4 text-center h-full">
+            <h3 class="font-display text-base md:text-lg text-ink">
+              {service.data.name}
+            </h3>
+            <p class="mt-2 text-sm text-ink/60 leading-relaxed">
+              {service.data.description}
+            </p>
+          </Card>
+        </Reveal>
+      ))}
+    </div>
+  </div>
+</section>

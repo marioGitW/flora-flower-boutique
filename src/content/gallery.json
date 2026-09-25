@@ -1,0 +1,130 @@
+[
+  {
+    "id": "branded-chocolates",
+    "src": "/src/assets/images/gallery/branded-chocolates.png",
+    "alt": "Брендирани чоколатца со розев акцент",
+    "category": "novorodence",
+    "width": 800,
+    "height": 1067
+  },
+  {
+    "id": "baby-balloon-boy",
+    "src": "/src/assets/images/gallery/baby-balloon-boy.png",
+    "alt": "Welcome Baby балон со мече — подарок за момче",
+    "category": "novorodence",
+    "width": 800,
+    "height": 1067
+  },
+  {
+    "id": "baptism-basket",
+    "src": "/src/assets/images/gallery/baptism-basket.png",
+    "alt": "Цветна корпа за крштевка со свеќи",
+    "category": "krstevki",
+    "width": 800,
+    "height": 1067
+  },
+  {
+    "id": "teddy-bouquet",
+    "src": "/src/assets/images/gallery/teddy-bouquet.png",
+    "alt": "Букет од мечиња во кутија",
+    "category": "novorodence",
+    "width": 800,
+    "height": 1067
+  },
+  {
+    "id": "baby-balloon-girl",
+    "src": "/src/assets/images/gallery/baby-balloon-girl.png",
+    "alt": "Welcome Baby Girl балон со мече — подарок за девојче",
+    "category": "novorodence",
+    "width": 800,
+    "height": 1067
+  },
+  {
+    "id": "white-arrangement-box",
+    "src": "/src/assets/images/gallery/white-arrangement-box.png",
+    "alt": "Аранжман од бели хризантеми во кутија",
+    "category": "aranzman-kutija",
+    "width": 800,
+    "height": 1067
+  },
+  {
+    "id": "pink-champagne-box",
+    "src": "/src/assets/images/gallery/pink-champagne-box.png",
+    "alt": "Розев аранжман со шампањ во кутија",
+    "category": "aranzman-kutija",
+    "width": 800,
+    "height": 1067
+  },
+  {
+    "id": "baby-bassinet",
+    "src": "/src/assets/images/gallery/baby-bassinet.png",
+    "alt": "Бебешки подарок во синечка кошуљка",
+    "category": "novorodence",
+    "width": 800,
+    "height": 800
+  },
+  {
+    "id": "white-wreath",
+    "src": "/src/assets/images/gallery/white-wreath.png",
+    "alt": "Бел венец од хризантеми",
+    "category": "venci",
+    "width": 800,
+    "height": 800
+  },
+  {
+    "id": "baby-display-boy",
+    "src": "/src/assets/images/gallery/baby-display-boy.png",
+    "alt": "Подарок за момче со балони и облека",
+    "category": "novorodence",
+    "width": 800,
+    "height": 1067
+  },
+  {
+    "id": "mixed-bouquet",
+    "src": "/src/assets/images/gallery/mixed-bouquet.png",
+    "alt": "Шарен букет со рози и хризантеми",
+    "category": "buketi",
+    "width": 800,
+    "height": 800
+  },
+  {
+    "id": "cylinder-arrangement",
+    "src": "/src/assets/images/gallery/cylinder-arrangement.png",
+    "alt": "Цветен аранжман во стаклен цилиндар",
+    "category": "aranzman-kutija",
+    "width": 800,
+    "height": 1067
+  },
+  {
+    "id": "flower-bag",
+    "src": "/src/assets/images/gallery/flower-bag.png",
+    "alt": "Аранжман во декоративна кеса Just For You",
+    "category": "aranzman-kutija",
+    "width": 800,
+    "height": 1067
+  },
+  {
+    "id": "hexagon-flowers",
+    "src": "/src/assets/images/gallery/hexagon-flowers.png",
+    "alt": "Бели далии во златен хексагон",
+    "category": "svadbi",
+    "width": 800,
+    "height": 800
+  },
+  {
+    "id": "engagement-bouquet",
+    "src": "/src/assets/images/gallery/engagement-bouquet.png",
+    "alt": "Свршувачки букет со шампањ",
+    "category": "svrsuvacki",
+    "width": 800,
+    "height": 800
+  },
+  {
+    "id": "bride-bouquet",
+    "src": "/src/assets/images/gallery/bride-bouquet.png",
+    "alt": "Невестински букет од бели каранфили",
+    "category": "svadbi",
+    "width": 800,
+    "height": 1067
+  }
+]

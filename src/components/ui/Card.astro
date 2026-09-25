@@ -1,0 +1,18 @@
+---
+interface Props {
+  class?: string;
+  bg?: string;
+}
+
+const { class: className = "", bg = "bg-cream" } = Astro.props;
+---
+
+<div
+  class:list={[
+    "rounded-lg overflow-hidden transition-shadow duration-200 hover:shadow-md",
+    bg,
+    className,
+  ]}
+>
+  <slot />
+</div>

@@ -1,0 +1,51 @@
+---
+import { site } from "../../data/site";
+import PetalField from "../motion/PetalField.astro";
+import Reveal from "../motion/Reveal.astro";
+import BloomSvg from "../motion/BloomSvg.astro";
+---
+
+<section class="relative min-h-[85dvh] flex items-center overflow-hidden bg-cream" aria-label="Почетна">
+  <PetalField count={10} />
+
+  <div class="relative z-10 mx-auto max-w-6xl px-4 py-20 text-center">
+    <Reveal>
+      <BloomSvg size={64} petalCount={6} class="mx-auto mb-6" />
+    </Reveal>
+
+    <Reveal delay={100}>
+      <h1 class="font-display text-5xl md:text-6xl text-ink leading-tight">
+        {site.name}
+      </h1>
+    </Reveal>
+
+    <Reveal delay={200}>
+      <p class="mt-2 font-display text-lg md:text-xl text-rose">
+        Бутик за цвеќе
+      </p>
+    </Reveal>
+
+    <Reveal delay={350}>
+      <p class="mx-auto mt-6 max-w-md text-base text-ink/70">
+        {site.tagline}
+      </p>
+    </Reveal>
+
+    <Reveal delay={500}>
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a
+          href="#uslugi"
+          class="inline-flex items-center justify-center rounded bg-rose px-6 py-3 text-base font-medium text-cream transition-colors hover:bg-rose-deep"
+        >
+          Погледнете ги нашите услуги
+        </a>
+        <a
+          href="#kontakt"
+          class="inline-flex items-center justify-center rounded border border-rose/30 px-6 py-3 text-base font-medium text-ink transition-colors hover:border-rose hover:text-rose-deep"
+        >
+          Контактирајте нè
+        </a>
+      </div>
+    </Reveal>
+  </div>
+</section>
