@@ -20,6 +20,7 @@ export const site = {
     full: "Ул. 3-та МУБ бр. 30, Куманово",
   },
 
+  // TODO: coordinates not confirmed — check against the shop's real pin before launch (used in JSON-LD).
   geo: {
     lat: 42.1322,
     lng: 21.7144,
@@ -32,7 +33,7 @@ export const site = {
     title: "Флора — Бутик за цвеќе | Куманово",
     description:
       "Флора — бутик за цвеќе и подароци во Куманово. Букети, аранжмани, подароци за новороденче, свадбени декорации и венци.",
-    ogImage: "/og-image.png",
+    ogImage: "/og-image.jpg",
   },
 } as const;
 

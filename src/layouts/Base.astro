@@ -35,7 +35,7 @@ const jsonLd = {
     longitude: site.geo.lng,
   },
   sameAs: [site.instagramUrl],
-  image: `${Astro.site}og-image.png`,
+  image: new URL(site.meta.ogImage, Astro.site).toString(),
 };
 ---
 
@@ -49,19 +49,25 @@ const jsonLd = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
 
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#FBF7F2" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={`${Astro.site}og-image.png`} />
+    <meta property="og:image" content={new URL(site.meta.ogImage, Astro.site).toString()} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:locale" content="mk_MK" />
     <meta property="og:site_name" content={site.nameFull} />
 
     <!-- JSON-LD -->
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body class="min-h-dvh bg-cream text-ink font-body antialiased">
     <slot />

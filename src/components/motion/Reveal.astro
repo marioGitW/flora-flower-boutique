@@ -52,8 +52,8 @@ const {
               if (prefersReduced) {
                 child.style.opacity = "1";
               } else {
-                child.style.animation = `flora-fade-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay + stagger}ms forwards`;
                 child.style.setProperty("--flora-rise-distance", `${distance}px`);
+                child.style.animation = `flora-fade-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay + stagger}ms forwards`;
               }
 
               FloraReveal.observer.unobserve(el);

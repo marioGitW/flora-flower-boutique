@@ -7,6 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "icons": "node scripts/generate-icons.mjs",
     "format": "prettier --write \"src/**/*.{astro,ts,tsx,css,json}\"",
     "lighthouse": "npx lighthouse http://localhost:4321 --output html --output-path ./lighthouse-report.html --chrome-flags=\"--headless\""
   },

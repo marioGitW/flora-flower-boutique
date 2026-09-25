@@ -1,0 +1,19 @@
+{
+  "name": "Флора — Бутик за цвеќе",
+  "short_name": "Флора",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#FBF7F2",
+  "background_color": "#FBF7F2",
+  "display": "browser"
+}

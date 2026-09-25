@@ -11,15 +11,16 @@ const services = defineCollection({
   }),
 });
 
+// `src` is resolved relative to gallery.json and becomes ImageMetadata,
+// so width/height come from the file itself.
 const gallery = defineCollection({
   loader: file("src/content/gallery.json"),
-  schema: z.object({
-    src: z.string(),
-    alt: z.string(),
-    category: z.string(),
-    width: z.number(),
-    height: z.number(),
-  }),
+  schema: ({ image }) =>
+    z.object({
+      src: image(),
+      alt: z.string(),
+      category: z.string(),
+    }),
 });
 
 export const collections = { services, gallery };
