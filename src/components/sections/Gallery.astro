@@ -4,6 +4,7 @@ import { Picture, getImage } from "astro:assets";
 import Reveal from "../motion/Reveal.astro";
 import DrawLine from "../motion/DrawLine.astro";
 import Lightbox from "../ui/Lightbox.astro";
+import { copy } from "../../data/copy";
 
 const gallery = await getCollection("gallery");
 
@@ -21,10 +22,10 @@ const items = await Promise.all(
 );
 ---
 
-<section id="galerija" class="bg-cream py-16 md:py-24" aria-label="Галерија">
+<section id="galerija" class="bg-cream py-16 md:py-24" aria-label={copy.gallery.heading}>
   <div class="mx-auto max-w-6xl px-4">
     <Reveal>
-      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">Галерија</h2>
+      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">{copy.gallery.heading}</h2>
     </Reveal>
 
     <Reveal delay={100}>
@@ -33,7 +34,7 @@ const items = await Promise.all(
 
     <Reveal delay={200}>
       <p class="mx-auto mt-6 max-w-lg text-center text-ink/70">
-        Секој аранжман е уникатен — изработен со внимание и љубов.
+        {copy.gallery.intro}
       </p>
     </Reveal>
 
@@ -45,7 +46,7 @@ const items = await Promise.all(
               class="block w-full overflow-hidden rounded cursor-pointer border-0 p-0 bg-mint/30"
               data-lightbox-src={item.fullSrc}
               data-lightbox-alt={item.alt}
-              aria-label={`Отвори: ${item.alt}`}
+              aria-label={`${copy.gallery.open} ${item.alt}`}
             >
               <Picture
                 src={item.src}

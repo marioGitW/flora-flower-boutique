@@ -3,70 +3,70 @@
     "id": "novorodence",
     "name": "Подароци за новороденче",
     "slug": "podaroci-za-novorodence",
-    "description": "Уникатни подароци за добредојде на новиот член на семејството.",
+    "description": "Балони, мечиња и бебешка облека — нежен поздрав за новиот член на семејството.",
     "order": 1
   },
   {
     "id": "krstevki",
     "name": "Крштевки",
     "slug": "krstevki",
-    "description": "Цветни аранжмани и декорации за крштевки.",
+    "description": "Корпи со цвеќе и украсени свеќи за крштевка.",
     "order": 2
   },
   {
     "id": "aranzman-kutija",
     "name": "Аранжмани во кутија",
     "slug": "aranzmani-vo-kutija",
-    "description": "Елегантни цветни аранжмани во декоративни кутии.",
+    "description": "Свежо цвеќе во кутија, подготвено да се подари.",
     "order": 3
   },
   {
     "id": "buketi",
     "name": "Букети",
     "slug": "buketi",
-    "description": "Рачно изработени букети за секоја прилика.",
+    "description": "Од едноставни до раскошни — букет по Ваша мерка.",
     "order": 4
   },
   {
     "id": "svadbi",
     "name": "Свадби",
     "slug": "svadbi",
-    "description": "Комплетна цветна декорација за вашиот најважен ден.",
+    "description": "Невестински букет и цвеќе за Вашиот голем ден.",
     "order": 5
   },
   {
     "id": "rodendeni",
     "name": "Родендени",
     "slug": "rodendeni",
-    "description": "Цветни изненадувања за роденденски прослави.",
+    "description": "Букет или подарок за роденденот на некој драг.",
     "order": 6
   },
   {
     "id": "matura",
     "name": "Матура и дипломирање",
     "slug": "matura-i-diplomiranje",
-    "description": "Букети и аранжмани за матура и дипломирање.",
+    "description": "Цвеќе за матурската вечер и за денот на дипломирањето.",
     "order": 7
   },
   {
     "id": "svrsuvacki",
     "name": "Свршувачки и годишнини",
     "slug": "svrsuvacki-i-godisnini",
-    "description": "Романтични аранжмани за свршувачки и годишнини.",
+    "description": "Цвеќе за денот кога ќе речете „да“ — и за секоја годишнина потоа.",
     "order": 8
   },
   {
     "id": "dekoracija-avtomobili",
     "name": "Декорација на автомобили",
     "slug": "dekoracija-na-avtomobili",
-    "description": "Цветна декорација за свадбени и свечени автомобили.",
+    "description": "Цветна декорација за свадбениот и свечениот автомобил.",
     "order": 9
   },
   {
     "id": "venci",
     "name": "Венци",
     "slug": "venci",
-    "description": "Венци за сите пригоди.",
+    "description": "Венци изработени со внимание и почит.",
     "order": 10
   }
 ]

@@ -1,37 +1,31 @@
 ---
 import { site } from "../../data/site";
+import { copy } from "../../data/copy";
 import Reveal from "../motion/Reveal.astro";
 import DrawLine from "../motion/DrawLine.astro";
 
-const steps = [
-  {
-    num: "01",
-    title: "Јавете се или пишете",
-    text: "Контактирајте нè преку телефон, Viber или Instagram.",
-  },
-  {
-    num: "02",
-    title: "Кажете ни за приликата",
-    text: "Опишете ја приликата и вашите желби — ние ќе ви предложиме.",
-  },
-  {
-    num: "03",
-    title: "Подигнете или примете",
-    text: "Подигнете го вашиот аранжман од бутикот или организираме достава.",
-  },
-];
+const steps = copy.howToOrder.steps.map((step, i) => ({
+  ...step,
+  num: String(i + 1).padStart(2, "0"),
+}));
 ---
 
-<section id="kako-naracuvate" class="bg-mint/30 py-16 md:py-24" aria-label="Како нарачувате">
+<section id="kako-naracuvate" class="bg-mint/30 py-16 md:py-24" aria-label={copy.howToOrder.heading}>
   <div class="mx-auto max-w-6xl px-4">
     <Reveal>
       <h2 class="font-display text-3xl md:text-4xl text-center text-ink">
-        Како нарачувате
+        {copy.howToOrder.heading}
       </h2>
     </Reveal>
 
     <Reveal delay={100}>
       <DrawLine class="mx-auto mt-4 max-w-[200px]" />
+    </Reveal>
+
+    <Reveal delay={200}>
+      <p class="mx-auto mt-6 max-w-lg text-center text-ink/75">
+        {copy.howToOrder.intro}
+      </p>
     </Reveal>
 
     <div class="mt-12 grid gap-8 md:grid-cols-3">
@@ -52,7 +46,7 @@ const steps = [
           href={site.phoneHref}
           class="inline-flex items-center justify-center rounded bg-rose px-6 py-3 text-base font-medium text-cream transition-colors hover:bg-rose-deep"
         >
-          Јавете се: {site.phoneFormatted}
+          {copy.howToOrder.cta} {site.phoneFormatted}
         </a>
       </div>
     </Reveal>

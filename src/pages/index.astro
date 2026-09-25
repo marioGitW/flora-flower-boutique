@@ -9,6 +9,7 @@ import HowToOrder from "../components/sections/HowToOrder.astro";
 import About from "../components/sections/About.astro";
 import Contact from "../components/sections/Contact.astro";
 import { site } from "../data/site";
+import { copy } from "../data/copy";
 ---
 
 <Base>
@@ -29,7 +30,7 @@ import { site } from "../data/site";
       <p class="mt-1 text-sm">{site.tagline}</p>
       <div class="mt-4 flex items-center justify-center gap-4 text-sm">
         <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class="hover:text-cream transition-colors">
-          Instagram
+          {copy.contact.instagram}
         </a>
         <span class="text-cream/30">·</span>
         <a href={site.phoneHref} class="hover:text-cream transition-colors">
@@ -37,7 +38,7 @@ import { site } from "../data/site";
         </a>
       </div>
       <p class="mt-6 text-xs text-cream/40">
-        &copy; {new Date().getFullYear()} {site.nameFull}
+        &copy; {new Date().getFullYear()} {site.nameFull}. {copy.footer.rights}
       </p>
     </div>
   </footer>

@@ -1,13 +1,8 @@
 ---
 import { site } from "../../data/site";
+import { copy } from "../../data/copy";
 
-const links = [
-  { href: "#uslugi", label: "Услуги" },
-  { href: "#galerija", label: "Галерија" },
-  { href: "#kako-naracuvate", label: "Како нарачувате" },
-  { href: "#za-nas", label: "За нас" },
-  { href: "#kontakt", label: "Контакт" },
-];
+const links = copy.nav.links;
 ---
 
 <header
@@ -15,10 +10,10 @@ const links = [
   id="flora-header"
 >
   <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-    <a href="/" class="font-display text-xl text-ink" aria-label={site.nameFull}>
-      Флора
+    <a href="/" class="font-display text-xl text-ink" aria-label={copy.nav.home}>
+      {site.name}
     </a>
-    <nav class="hidden md:flex items-center gap-6" aria-label="Главна навигација">
+    <nav class="hidden md:flex items-center gap-6" aria-label={copy.nav.label}>
       {links.map((link) => (
         <a
           href={link.href}
@@ -30,7 +25,7 @@ const links = [
     </nav>
     <button
       class="relative z-50 flex h-10 w-10 items-center justify-center md:hidden"
-      aria-label="Мени"
+      aria-label={copy.nav.open}
       aria-expanded="false"
       id="flora-menu-toggle"
     >

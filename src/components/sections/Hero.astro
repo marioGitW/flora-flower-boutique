@@ -1,5 +1,6 @@
 ---
 import { site } from "../../data/site";
+import { copy } from "../../data/copy";
 import PetalField from "../motion/PetalField.astro";
 import Reveal from "../motion/Reveal.astro";
 import BloomSvg from "../motion/BloomSvg.astro";
@@ -21,14 +22,20 @@ import ContactIcon from "../ui/ContactIcon.astro";
     </Reveal>
 
     <Reveal delay={200}>
-      <p class="mt-2 font-display text-lg md:text-xl text-rose">
-        Бутик за цвеќе
+      <p class="mt-2 font-display text-lg md:text-xl text-rose-ink">
+        {copy.hero.kind}
       </p>
     </Reveal>
 
     <Reveal delay={350}>
-      <p class="mx-auto mt-6 max-w-md text-base text-ink/70">
+      <p class="mx-auto mt-6 max-w-md font-display text-xl text-ink">
         {site.tagline}
+      </p>
+    </Reveal>
+
+    <Reveal delay={450}>
+      <p class="mx-auto mt-3 max-w-md text-base text-ink/75">
+        {copy.hero.lead}
       </p>
     </Reveal>
 
@@ -39,14 +46,14 @@ import ContactIcon from "../ui/ContactIcon.astro";
         class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-rose-ink px-5 py-3 text-base font-medium text-cream transition-colors hover:bg-rose-ink-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-ink"
       >
         <ContactIcon name="phone" />
-        Повикај {site.phoneFormatted}
+        {copy.hero.callLabel} {site.phoneFormatted}
       </a>
       <a
         href={site.viberHref}
         class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-viber px-5 py-3 text-base font-medium text-cream transition-colors hover:bg-viber-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-viber"
       >
         <ContactIcon name="viber" />
-        Пиши ни на Viber
+        {copy.hero.viberLabel}
       </a>
     </div>
   </div>

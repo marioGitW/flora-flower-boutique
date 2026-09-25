@@ -7,7 +7,10 @@ export default defineConfig({
   // TODO: domain not confirmed by the owner — verify before launch (drives canonical, OG and sitemap URLs).
   site: "https://floraboutique.mk",
   output: "static",
-  integrations: [sitemap(), pruneUnusedOriginals()],
+  integrations: [
+    sitemap({ filter: (page) => !page.includes("/type-check") }),
+    pruneUnusedOriginals(),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

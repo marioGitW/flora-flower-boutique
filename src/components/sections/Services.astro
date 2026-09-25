@@ -3,16 +3,17 @@ import { getCollection } from "astro:content";
 import Reveal from "../motion/Reveal.astro";
 import DrawLine from "../motion/DrawLine.astro";
 import Card from "../ui/Card.astro";
+import { copy } from "../../data/copy";
 
 const services = (await getCollection("services")).sort(
   (a, b) => a.data.order - b.data.order,
 );
 ---
 
-<section id="uslugi" class="bg-blush/40 py-16 md:py-24" aria-label="Услуги">
+<section id="uslugi" class="bg-blush/40 py-16 md:py-24" aria-label={copy.services.heading}>
   <div class="mx-auto max-w-6xl px-4">
     <Reveal>
-      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">Услуги</h2>
+      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">{copy.services.heading}</h2>
     </Reveal>
 
     <Reveal delay={100}>
@@ -21,7 +22,7 @@ const services = (await getCollection("services")).sort(
 
     <Reveal delay={200}>
       <p class="mx-auto mt-6 max-w-lg text-center text-ink/70">
-        Од нежни букети до комплетни свадбени декорации — секој момент заслужува цветна приказна.
+        {copy.services.intro}
       </p>
     </Reveal>
 

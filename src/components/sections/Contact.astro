@@ -1,42 +1,61 @@
 ---
 import { site } from "../../data/site";
+import { copy } from "../../data/copy";
 import Reveal from "../motion/Reveal.astro";
 import DrawLine from "../motion/DrawLine.astro";
+
+const t = copy.contact;
+const linkClass = "inline-block text-rose-ink underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-ink";
 ---
 
-<section id="kontakt" class="bg-lilac/30 py-16 md:py-24" aria-label="Контакт">
+<section id="kontakt" class="bg-lilac/30 py-16 md:py-24" aria-label={t.heading}>
   <div class="mx-auto max-w-6xl px-4">
     <Reveal>
-      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">Контакт</h2>
+      <h2 class="font-display text-3xl md:text-4xl text-center text-ink">{t.heading}</h2>
     </Reveal>
 
     <Reveal delay={100}>
       <DrawLine class="mx-auto mt-4 max-w-[200px]" />
     </Reveal>
 
+    <Reveal delay={200}>
+      <p class="mx-auto mt-6 max-w-lg text-center text-ink/75">{t.intro}</p>
+    </Reveal>
+
     <div class="mt-12 mx-auto grid max-w-3xl gap-8 md:grid-cols-2">
       <Reveal delay={200}>
         <div>
-          <h3 class="font-display text-xl text-ink">Адреса</h3>
-          <p class="mt-2 text-ink/70">{site.address.full}</p>
+          <h3 class="font-display text-xl text-ink">{t.addressLabel}</h3>
+          <address class="mt-2 not-italic">
+            <a href={site.mapUrl} target="_blank" rel="noopener noreferrer" class={linkClass}>
+              {site.address.full}
+            </a>
+          </address>
 
-          <h3 class="mt-6 font-display text-xl text-ink">Телефон</h3>
-          <a
-            href={site.phoneHref}
-            class="mt-2 inline-block text-rose-deep hover:underline"
-          >
-            {site.phoneFormatted}
-          </a>
+          <h3 class="mt-6 font-display text-xl text-ink">{t.phoneLabel}</h3>
+          <a href={site.phoneHref} class={`mt-2 ${linkClass}`}>{site.phoneFormatted}</a>
 
-          <h3 class="mt-6 font-display text-xl text-ink">Instagram</h3>
-          <a
-            href={site.instagramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="mt-2 inline-block text-rose-deep hover:underline"
-          >
-            {site.instagram}
-          </a>
+          <h3 class="mt-6 font-display text-xl text-ink">{t.writeLabel}</h3>
+          <ul class="mt-2 space-y-1">
+            <li><a href={site.viberHref} class={linkClass}>{t.viber}</a></li>
+            <li><a href={site.whatsappHref} target="_blank" rel="noopener noreferrer" class={linkClass}>{t.whatsapp}</a></li>
+            <li>
+              <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class={linkClass}>
+                {t.instagram} {site.instagram}
+              </a>
+            </li>
+          </ul>
+
+          <h3 class="mt-6 font-display text-xl text-ink">{t.hoursLabel}</h3>
+          {site.hours ? (
+            <ul class="mt-2 text-ink/80">
+              {site.hours.map((h) => (
+                <li>{h.days && `${h.days}: `}{h.time}</li>
+              ))}
+            </ul>
+          ) : (
+            <p class="mt-2 text-ink/75">{t.hoursPending}</p>
+          )}
         </div>
       </Reveal>
 
@@ -46,16 +65,15 @@ import DrawLine from "../motion/DrawLine.astro";
             href={site.mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="block aspect-[4/3] bg-mint/40 flex items-center justify-center text-ink/40 text-sm hover:bg-mint/60 transition-colors"
-            aria-label="Отвори мапа"
+            class="flex aspect-[4/3] items-center justify-center bg-mint/40 text-sm text-ink/75 transition-colors hover:bg-mint/60"
           >
-            <div class="text-center">
-              <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <span class="text-center">
+              <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
                 <circle cx="12" cy="9" r="2.5" />
               </svg>
-              Отвори на Google Maps
-            </div>
+              {t.mapOpen}
+            </span>
           </a>
         </div>
       </Reveal>

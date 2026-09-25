@@ -1,4 +1,6 @@
 ---
+import { copy } from "../../data/copy";
+
 interface Props {
   class?: string;
 }
@@ -12,7 +14,7 @@ const { class: className = "" } = Astro.props;
   >
     <button
       class="flora-lightbox-close absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-cream/20 text-cream hover:bg-cream/40 transition-colors"
-      aria-label="Затвори"
+      aria-label={copy.gallery.close}
     >
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="4" y1="4" x2="16" y2="16" />
