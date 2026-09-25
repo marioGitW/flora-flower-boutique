@@ -1,6 +1,5 @@
 ---
 import { getCollection } from "astro:content";
-import { Picture } from "astro:assets";
 import { site } from "../../data/site";
 import { copy } from "../../data/copy";
 import Reveal from "../motion/Reveal.astro";
@@ -8,6 +7,7 @@ import BloomSvg from "../motion/BloomSvg.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import OrderSheet from "../ui/OrderSheet.astro";
 import SectionDivider from "../ui/SectionDivider.astro";
+import DeferredPicture from "../ui/DeferredPicture.astro";
 
 const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
 const gallery = await getCollection("gallery");
@@ -59,16 +59,12 @@ const cards = services.map((s, i) => ({
                 ]}
               >
                 {card.photo ? (
-                  <Picture
+                  <DeferredPicture
                     src={card.photo.src}
                     alt=""
-                    formats={["avif", "webp"]}
-                    fallbackFormat="webp"
-                    widths={[200, 300, 420, 600]}
+                    widths={[200, 320, 480, 600]}
                     sizes={card.wide ? "(min-width: 1024px) 280px, 46vw" : "(min-width: 1024px) 270px, 46vw"}
-                    quality={70}
-                    loading="lazy"
-                    decoding="async"
+                    quality={55}
                     class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                   />
                 ) : (

@@ -23,9 +23,8 @@ import ContactIcon from "../ui/ContactIcon.astro";
       fallbackFormat="webp"
       widths={[390, 560, 741]}
       sizes="(min-width: 1024px) 50vw, 100vw"
-      quality={70}
+      quality={55}
       loading="eager"
-      fetchpriority="high"
       class="h-full w-full object-cover object-[50%_30%]"
     />
     {/* Warm cream veil keeps text AA over the photo on mobile; on desktop the text sits on plain cream. */}
@@ -45,15 +44,16 @@ import ContactIcon from "../ui/ContactIcon.astro";
   <div class="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-24 lg:grid lg:grid-cols-2 lg:pb-24 lg:pt-28">
     <div class="mx-auto max-w-md text-center lg:mx-0 lg:max-w-lg lg:pr-12 lg:text-left">
       <Reveal>
+        {/* WebP, not AVIF: the watercolour-with-alpha logo compresses worse as AVIF. */}
         <Image
           src={images.logo}
           alt=""
-          widths={[112, 224, 336]}
+          format="webp"
+          widths={[112, 224]}
           sizes="112px"
           width={112}
           height={112}
-          format="webp"
-          quality={80}
+          quality={65}
           loading="eager"
           class="mx-auto mb-2 h-28 w-28 lg:mx-0 lg:-ml-2"
         />
@@ -70,7 +70,7 @@ import ContactIcon from "../ui/ContactIcon.astro";
       </Reveal>
 
       <Reveal delay={240}>
-        <p class="mt-6 font-display text-xl italic leading-snug text-ink lg:text-2xl">
+        <p class="mt-6 font-display text-xl leading-snug text-ink lg:text-2xl">
           {site.tagline}
         </p>
       </Reveal>

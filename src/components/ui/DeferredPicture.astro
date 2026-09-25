@@ -1,0 +1,64 @@
+---
+import type { ImageMetadata } from "astro";
+import { getImage } from "astro:assets";
+
+/**
+ * Like <Picture>, but the browser doesn't fetch anything until the image is
+ * ~200px from the viewport. Native loading="lazy" starts ~1250px early, which on
+ * a phone pulls the first service photos into the critical first-paint window.
+ * Without JS the <noscript> copy is used, so images still show.
+ */
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  widths: number[];
+  sizes: string;
+  quality?: number;
+  class?: string;
+}
+
+const { src, alt, widths, sizes, quality = 60, class: className = "" } = Astro.props;
+
+const build = async (format: "avif" | "webp") => {
+  const imgs = await Promise.all(widths.map((width) => getImage({ src, width, format, quality })));
+  return imgs.map((img, i) => `${img.src} ${widths[i]}w`).join(", ");
+};
+
+const avif = await build("avif");
+const webp = await build("webp");
+const fallback = await getImage({ src, width: widths[Math.floor(widths.length / 2)], format: "webp", quality });
+const { width, height } = fallback.attributes as { width: number; height: number };
+---
+
+<picture class="js-only" data-deferred>
+  <source type="image/avif" data-srcset={avif} sizes={sizes} />
+  <source type="image/webp" data-srcset={webp} sizes={sizes} />
+  <img data-src={fallback.src} alt={alt} width={width} height={height} decoding="async" class={className} />
+</picture>
+<noscript>
+  <picture>
+    <source type="image/avif" srcset={avif} sizes={sizes} />
+    <source type="image/webp" srcset={webp} sizes={sizes} />
+    <img src={fallback.src} alt={alt} width={width} height={height} loading="lazy" decoding="async" class={className} />
+  </picture>
+</noscript>
+
+<script>
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const picture = entry.target as HTMLElement;
+        for (const source of picture.querySelectorAll<HTMLSourceElement>("source[data-srcset]")) {
+          source.srcset = source.dataset.srcset!;
+        }
+        const img = picture.querySelector<HTMLImageElement>("img[data-src]");
+        if (img) img.src = img.dataset.src!;
+        observer.unobserve(picture);
+      }
+    },
+    { rootMargin: "200px 0px" },
+  );
+
+  for (const el of document.querySelectorAll("[data-deferred]")) observer.observe(el);
+</script>

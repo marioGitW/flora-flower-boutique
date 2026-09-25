@@ -1,10 +1,11 @@
 ---
 import { getCollection } from "astro:content";
-import { Picture, getImage } from "astro:assets";
+import { getImage } from "astro:assets";
 import { copy } from "../../data/copy";
 import SectionHeading from "../ui/SectionHeading.astro";
 import Lightbox from "../ui/Lightbox.astro";
 import SectionDivider from "../ui/SectionDivider.astro";
+import DeferredPicture from "../ui/DeferredPicture.astro";
 
 const gallery = await getCollection("gallery");
 const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
@@ -77,16 +78,12 @@ const items = await Promise.all(
                 style={`aspect-ratio: ${item.w} / ${item.h}`}
                 aria-label={`${copy.gallery.open} ${item.alt}`}
               >
-                <Picture
+                <DeferredPicture
                   src={item.src}
                   alt={item.alt}
-                  formats={["avif", "webp"]}
-                  fallbackFormat="webp"
                   widths={thumbWidths}
                   sizes={thumbSizes}
-                  quality={72}
-                  loading="lazy"
-                  decoding="async"
+                  quality={68}
                   class="block h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                 />
               </a>

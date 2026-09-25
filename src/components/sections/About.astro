@@ -1,10 +1,10 @@
 ---
-import { Picture } from "astro:assets";
 import { copy } from "../../data/copy";
 import { images } from "../../data/images";
 import Reveal from "../motion/Reveal.astro";
 import BloomSvg from "../motion/BloomSvg.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
+import DeferredPicture from "../ui/DeferredPicture.astro";
 
 const t = copy.about;
 ---
@@ -12,16 +12,12 @@ const t = copy.about;
 <section id="za-nas" class="bg-butter/40 lg:grid lg:min-h-[90svh] lg:grid-cols-2" aria-labelledby="za-nas-title">
   {/* The painted panelling and ribbon wall are the brand; the photo runs edge to edge. */}
   <div class="relative aspect-[4/5] max-h-[80svh] w-full overflow-hidden sm:aspect-[4/3] lg:aspect-auto lg:max-h-none">
-    <Picture
+    <DeferredPicture
       src={images.about}
       alt={t.imageAlt}
-      formats={["avif", "webp"]}
-      fallbackFormat="webp"
       widths={[390, 560, 727]}
       sizes="(min-width: 1024px) 50vw, 100vw"
-      quality={70}
-      loading="lazy"
-      decoding="async"
+      quality={65}
       class="absolute inset-0 h-full w-full object-cover object-[50%_40%]"
     />
   </div>

@@ -64,7 +64,7 @@ const hours = site.hours?.map((h) => (h.days ? `${h.days}: ${h.time}` : h.time))
     </div>
   </div>
 
-  <div class="relative aspect-[4/3] w-full bg-mint/60 lg:aspect-auto lg:min-h-[36rem]">
+  <div class="flora-map-frame relative aspect-[4/3] w-full bg-mint/60 lg:aspect-auto lg:min-h-[36rem]">
     <iframe
       src={site.mapEmbedUrl}
       title={t.mapTitle}
@@ -75,3 +75,29 @@ const hours = site.hours?.map((h) => (h.days ? `${h.days}: ${h.time}` : h.time))
     ></iframe>
   </div>
 </section>
+
+<style>
+  /* Ring drawn over the map while keyboard focus is inside it (see script). */
+  .flora-map-frame.has-focus::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 3px solid var(--color-rose-ink);
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  // The map is a cross-origin frame: once focus moves into it the parent page's
+  // :focus / :focus-within never match, so CSS alone can't show a focus ring.
+  // The window blurs when focus enters the frame — use that to draw the ring.
+  const frame = document.querySelector<HTMLElement>(".flora-map-frame");
+  const map = frame?.querySelector("iframe");
+  if (frame && map) {
+    window.addEventListener("blur", () => {
+      requestAnimationFrame(() => frame.classList.toggle("has-focus", document.activeElement === map));
+    });
+    window.addEventListener("focus", () => frame.classList.remove("has-focus"));
+    document.addEventListener("focusin", () => frame.classList.remove("has-focus"));
+  }
+</script>
