@@ -12,6 +12,10 @@ export const site = {
 
   instagram: "@flora__flowerboutique",
   instagramUrl: "https://www.instagram.com/flora__flowerboutique/",
+  // Opens a DM instead of the profile. Checked: ig.me redirects to Instagram's
+  // DM route (instagram.com/m/<handle>); logged-out browsers get the login
+  // page first and continue to the chat after signing in.
+  instagramDmHref: "https://ig.me/m/flora__flowerboutique",
 
   address: {
     street: "Ул. 3-та МУБ бр. 30",
@@ -26,8 +30,7 @@ export const site = {
     lng: 21.71895,
   },
 
-  // TODO: days not confirmed — only the time is known. Add e.g. days: "Понеделник – Сабота".
-  hours: [{ time: "10:00 – 18:00" }] as null | ReadonlyArray<{ days?: string; time: string }>,
+  hours: [{ days: "Понеделник – Сабота", time: "10:00 – 18:00ч" }],
 
   // Google Maps place "Цвеќара Флора" — the owner's pin.
   mapUrl: "https://maps.google.com/?cid=3073187388721178971",

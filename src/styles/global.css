@@ -16,6 +16,11 @@
   --color-rose-ink-hover: #874848;
   --color-viber: #665CAC;
   --color-viber-hover: #564D96;
+  /* Darkened from the brand colours so cream glyphs on them clear 4.5:1 */
+  --color-whatsapp: #0E7A5F;
+  --color-whatsapp-hover: #0B634D;
+  --color-instagram: #C13584;
+  --color-instagram-hover: #A42C70;
   --color-gold: #C9A961;
   --color-sage: #9CAF9C;
   --color-ink: #3A3330;
@@ -101,13 +106,23 @@ html:not(.js) .js-only {
   display: none !important;
 }
 
-flora-reveal,
 flora-draw-line {
   display: block;
 }
 
-.js flora-reveal > * {
-  opacity: 0;
+/* Scroll reveal — src/scripts/reveal.ts adds .is-revealed once in view.
+   Hidden only with JS and motion allowed; fill is `backwards` so nothing is
+   held after the entrance and hover transforms keep working. */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal]:not(.is-revealed) {
+    opacity: 0;
+  }
+  .js [data-reveal].is-revealed {
+    animation: flora-reveal 0.6s cubic-bezier(0.33, 1, 0.68, 1) var(--reveal-delay, 0ms) backwards;
+  }
+  .js [data-reveal="image"].is-revealed {
+    animation-name: flora-reveal-image;
+  }
 }
 
 /* Inset moulding line, after the painted wall panels in the shop. */
@@ -169,6 +184,20 @@ flora-draw-line {
   }
 }
 
+@keyframes flora-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+}
+
+@keyframes flora-reveal-image {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
 @keyframes flora-draw-in {
   from {
     stroke-dashoffset: var(--flora-dash-length, 1000);
@@ -217,11 +246,5 @@ flora-draw-line {
 
   .flora-petal-field {
     display: none !important;
-  }
-
-  /* Final state immediately — don't wait for the observer to fire. */
-  .js flora-reveal > * {
-    opacity: 1 !important;
-    animation: none !important;
   }
 }

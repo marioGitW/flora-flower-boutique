@@ -1,0 +1,149 @@
+---
+import { site } from "../../data/site";
+import { copy } from "../../data/copy";
+import Icon from "./Icon.astro";
+
+const t = copy.contact;
+
+/**
+ * Map facade: a drawn placeholder with the address, and the Google iframe only
+ * after „Прикажи мапа" is pressed, so no third-party frame loads with the page.
+ * The box has a fixed aspect ratio and the frame is absolutely positioned inside
+ * it, so swapping one for the other shifts nothing. Without JS the button is
+ * hidden; the address and the Google Maps link below still work.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<div class={className}>
+  <flora-map
+    class="relative block aspect-[4/3] overflow-hidden rounded-lg bg-mint shadow-[0_1px_0_rgb(58_51_48/0.06)] ring-1 ring-ink/5 sm:aspect-[16/9] lg:aspect-[21/9]"
+    data-src={site.mapEmbedUrl}
+    data-title={t.mapTitle}
+  >
+    <div class="absolute inset-0" data-map-placeholder>
+      {/* A few soft streets, a river and a park — decorative, not the real area. */}
+      <svg
+        class="absolute inset-0 h-full w-full"
+        viewBox="0 0 400 300"
+        preserveAspectRatio="xMidYMid slice"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path d="M-20 34C90 74 230 -2 420 44" stroke="var(--color-lilac)" stroke-width="22" stroke-linecap="round" />
+        <ellipse cx="318" cy="228" rx="62" ry="40" fill="var(--color-sage)" fill-opacity="0.35" />
+        <g stroke="var(--color-cream)" stroke-linecap="round">
+          <path d="M-20 104L420 74" stroke-width="6" />
+          <path d="M-20 262L420 292" stroke-width="6" />
+          <path d="M62 -20L92 320" stroke-width="6" />
+          <path d="M252 -20L236 320" stroke-width="5" />
+          <path d="M-20 206C80 186 170 228 420 168" stroke-width="13" />
+          <path d="M150 -20L196 320" stroke-width="13" />
+          <path d="M338 -20C312 90 352 170 322 320" stroke-width="9" />
+        </g>
+      </svg>
+
+      <div class="relative flex h-full items-center justify-center p-4">
+        <div class="flex max-w-xs flex-col items-center rounded-lg bg-cream/95 px-6 py-5 text-center shadow-[0_12px_32px_-16px_rgb(58_51_48/0.35)] ring-1 ring-ink/5">
+          <span class="-mt-11 mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rose-ink text-cream shadow-md">
+            <Icon name="place" size="lg" />
+          </span>
+          <p class="font-display text-xl leading-snug text-ink">
+            {site.address.street}<br />{site.address.city}
+          </p>
+          <button
+            type="button"
+            class="js-only mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-5 text-[0.9375rem] font-medium text-cream transition-colors hover:bg-rose-ink-hover disabled:cursor-progress disabled:opacity-80"
+            data-map-load
+          >
+            <Icon name="map" />
+            {t.showMap}
+          </button>
+        </div>
+      </div>
+    </div>
+  </flora-map>
+
+  <a
+    href={site.mapUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="mt-3 inline-flex min-h-11 items-center gap-1.5 font-medium text-rose-ink underline-offset-4 hover:underline"
+  >
+    {t.openInMaps}
+    <Icon name="external" size="sm" />
+    <span class="sr-only">{t.newWindow}</span>
+  </a>
+</div>
+
+<style>
+  flora-map :global(iframe) {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  flora-map.is-loaded :global(iframe) {
+    opacity: 1;
+  }
+  /* Ring drawn over the map while keyboard focus is inside it (see script). */
+  flora-map.has-focus::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 3px solid var(--color-rose-ink);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  class FloraMap extends HTMLElement {
+    connectedCallback() {
+      const button = this.querySelector<HTMLButtonElement>("[data-map-load]");
+      button?.addEventListener("click", () => this.load(button), { once: true });
+
+      // The map is a cross-origin frame: once focus moves into it the parent page's
+      // :focus / :focus-within never match, so CSS alone can't show a focus ring.
+      // The window blurs when focus enters the frame — use that to draw the ring.
+      window.addEventListener("blur", () => {
+        requestAnimationFrame(() => {
+          const frame = this.querySelector("iframe");
+          this.classList.toggle("has-focus", !!frame && document.activeElement === frame);
+        });
+      });
+      window.addEventListener("focus", () => this.classList.remove("has-focus"));
+      document.addEventListener("focusin", () => this.classList.remove("has-focus"));
+    }
+
+    load(button: HTMLButtonElement) {
+      // Keyboard users continue into the map; pointer users just see it appear.
+      const fromKeyboard = button.matches(":focus-visible");
+      button.disabled = true;
+
+      const frame = document.createElement("iframe");
+      frame.src = this.dataset.src!;
+      frame.title = this.dataset.title!;
+      frame.referrerPolicy = "strict-origin-when-cross-origin";
+      frame.allowFullscreen = true;
+      frame.className = "absolute inset-0 h-full w-full border-0";
+      frame.addEventListener(
+        "load",
+        () => {
+          this.classList.add("is-loaded");
+          if (fromKeyboard) frame.focus();
+          // Placeholder stays underneath until the frame has faded in over it.
+          setTimeout(() => {
+            this.querySelector<HTMLElement>("[data-map-placeholder]")!.hidden = true;
+          }, 400);
+        },
+        { once: true },
+      );
+      this.append(frame);
+    }
+  }
+
+  customElements.define("flora-map", FloraMap);
+</script>

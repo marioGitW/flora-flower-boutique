@@ -1,103 +1,65 @@
 ---
 import { site } from "../../data/site";
 import { copy } from "../../data/copy";
-import Reveal from "../motion/Reveal.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
-import ContactIcon from "../ui/ContactIcon.astro";
+import ContactLinks from "../ui/ContactLinks.astro";
+import MapCard from "../ui/MapCard.astro";
+import Icon from "../ui/Icon.astro";
 
 const t = copy.contact;
 
-type Row = {
-  icon: "phone" | "viber" | "whatsapp" | "instagram" | "pin";
-  label: string;
-  value: string;
-  href: string;
-  external?: boolean;
-};
-
-const rows: Row[] = [
-  { icon: "phone", label: t.phoneLabel, value: site.phoneFormatted, href: site.phoneHref },
-  { icon: "viber", label: t.viber, value: t.viberAction, href: site.viberHref },
-  { icon: "whatsapp", label: t.whatsapp, value: t.whatsappAction, href: site.whatsappHref, external: true },
-  { icon: "instagram", label: t.instagram, value: site.instagram, href: site.instagramUrl, external: true },
-  { icon: "pin", label: t.addressLabel, value: site.address.full, href: site.mapUrl, external: true },
-];
-
-const hours = site.hours?.map((h) => (h.days ? `${h.days}: ${h.time}` : h.time)) ?? [t.hoursPending];
+// Call and message carry equal weight (raised cards, 56px round targets);
+// the visit card is flat and quieter.
+const raised = "rounded-lg bg-cream p-6 shadow-[0_1px_0_rgb(58_51_48/0.06)] ring-1 ring-ink/5";
+const eyebrow = "font-body text-xs font-semibold uppercase tracking-[0.18em] text-rose-ink";
 ---
 
-<section id="kontakt" class="bg-lilac/40 lg:grid lg:grid-cols-2" aria-labelledby="kontakt-title">
-  <div class="px-4 py-20 lg:flex lg:justify-end lg:py-28 lg:pl-8 lg:pr-16">
-    <div class="mx-auto w-full max-w-md lg:mx-0">
-      <SectionHeading id="kontakt-title" title={t.heading} intro={t.intro} alignLeftLg />
+<section id="kontakt" class="bg-lilac/40 py-20 lg:py-28" aria-labelledby="kontakt-title">
+  <div class="mx-auto max-w-6xl px-4">
+    <SectionHeading id="kontakt-title" title={t.heading} />
 
-      <Reveal delay={200}>
-        <ul class="mt-10 divide-y divide-ink/10 overflow-hidden rounded-lg bg-cream/80 ring-1 ring-ink/5" role="list">
-          {rows.map((r) => (
-            <li>
-              <a
-                href={r.href}
-                {...(r.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                class="group flex min-h-14 items-center gap-4 px-4 py-3 transition-colors hover:bg-white/70"
-              >
-                <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-blush text-rose-ink">
-                  <ContactIcon name={r.icon} size={20} />
-                </span>
-                <span class="min-w-0">
-                  <span class="block text-sm text-ink/75">{r.label}</span>
-                  <span class="block font-medium text-ink group-hover:text-rose-ink">{r.value}</span>
-                </span>
-              </a>
-            </li>
-          ))}
-          <li class="flex min-h-14 items-center gap-4 px-4 py-3">
-            <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-butter text-ink/80">
-              <ContactIcon name="clock" size={20} />
-            </span>
+    <div class="mx-auto mt-12 grid max-w-md gap-4 md:max-w-none md:grid-cols-3 md:gap-5 lg:mt-16" data-reveal-stagger>
+      <div class={raised} data-reveal>
+        <h3 class={eyebrow}>{t.call}</h3>
+        <a href={site.phoneHref} class="group mt-4 flex items-center gap-4">
+          <span class="flex h-14 w-14 flex-none items-center justify-center rounded-full bg-rose-ink text-cream shadow-sm transition-colors group-hover:bg-rose-ink-hover">
+            <Icon name="phone" size="xl" />
+          </span>
+          <span class="whitespace-nowrap font-display text-[1.75rem] leading-none text-ink transition-colors group-hover:text-rose-ink sm:text-3xl">
+            {site.phoneFormatted}
+          </span>
+        </a>
+      </div>
+
+      <div class={raised} data-reveal>
+        <h3 class={eyebrow}>{t.message}</h3>
+        <ContactLinks channels={["viber", "whatsapp", "instagram"]} class="mt-4" />
+      </div>
+
+      <div class="rounded-lg p-6 ring-1 ring-ink/10" data-reveal>
+        <h3 class={eyebrow}>{t.visit}</h3>
+        <ul class="mt-4 space-y-3 text-ink/85" role="list">
+          <li class="flex gap-3">
+            <Icon name="place" class="mt-0.5 text-rose-ink" />
+            <span>{site.address.full}</span>
+          </li>
+          <li class="flex gap-3">
+            <Icon name="schedule" class="mt-0.5 text-rose-ink" />
             <span>
-              <span class="block text-sm text-ink/75">{t.hoursLabel}</span>
-              {hours.map((h) => <span class="block font-medium text-ink">{h}</span>)}
+              <span class="sr-only">{t.hoursLabel}: </span>
+              {site.hours.map((h) => (
+                <span class="block">
+                  <span class="whitespace-nowrap">{h.days}</span> <span class="whitespace-nowrap">{h.time}</span>
+                </span>
+              ))}
             </span>
           </li>
         </ul>
-      </Reveal>
+      </div>
+    </div>
+
+    <div class="mx-auto mt-4 max-w-md md:mt-5 md:max-w-none" data-reveal>
+      <MapCard />
     </div>
   </div>
-
-  <div class="flora-map-frame relative aspect-[4/3] w-full bg-mint/60 lg:aspect-auto lg:min-h-[36rem]">
-    <iframe
-      src={site.mapEmbedUrl}
-      title={t.mapTitle}
-      loading="lazy"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen
-      class="absolute inset-0 h-full w-full border-0"
-    ></iframe>
-  </div>
 </section>
-
-<style>
-  /* Ring drawn over the map while keyboard focus is inside it (see script). */
-  .flora-map-frame.has-focus::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border: 3px solid var(--color-rose-ink);
-    pointer-events: none;
-  }
-</style>
-
-<script>
-  // The map is a cross-origin frame: once focus moves into it the parent page's
-  // :focus / :focus-within never match, so CSS alone can't show a focus ring.
-  // The window blurs when focus enters the frame — use that to draw the ring.
-  const frame = document.querySelector<HTMLElement>(".flora-map-frame");
-  const map = frame?.querySelector("iframe");
-  if (frame && map) {
-    window.addEventListener("blur", () => {
-      requestAnimationFrame(() => frame.classList.toggle("has-focus", document.activeElement === map));
-    });
-    window.addEventListener("focus", () => frame.classList.remove("has-focus"));
-    document.addEventListener("focusin", () => frame.classList.remove("has-focus"));
-  }
-</script>

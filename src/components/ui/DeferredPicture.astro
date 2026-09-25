@@ -14,10 +14,12 @@ interface Props {
   widths: number[];
   sizes: string;
   quality?: number;
+  /** Fade and settle in on scroll (see src/scripts/reveal.ts). */
+  reveal?: boolean;
   class?: string;
 }
 
-const { src, alt, widths, sizes, quality = 60, class: className = "" } = Astro.props;
+const { src, alt, widths, sizes, quality = 60, reveal = false, class: className = "" } = Astro.props;
 
 const build = async (format: "avif" | "webp") => {
   const imgs = await Promise.all(widths.map((width) => getImage({ src, width, format, quality })));
@@ -33,7 +35,15 @@ const { width, height } = fallback.attributes as { width: number; height: number
 <picture class="js-only" data-deferred>
   <source type="image/avif" data-srcset={avif} sizes={sizes} />
   <source type="image/webp" data-srcset={webp} sizes={sizes} />
-  <img data-src={fallback.src} alt={alt} width={width} height={height} decoding="async" class={className} />
+  <img
+    data-src={fallback.src}
+    alt={alt}
+    width={width}
+    height={height}
+    decoding="async"
+    data-reveal={reveal ? "image" : undefined}
+    class={className}
+  />
 </picture>
 <noscript>
   <picture>

@@ -6,6 +6,7 @@ import SectionHeading from "../ui/SectionHeading.astro";
 import Lightbox from "../ui/Lightbox.astro";
 import SectionDivider from "../ui/SectionDivider.astro";
 import DeferredPicture from "../ui/DeferredPicture.astro";
+import Icon from "../ui/Icon.astro";
 
 const gallery = await getCollection("gallery");
 const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
@@ -41,31 +42,41 @@ const items = await Promise.all(
 );
 ---
 
-<section id="galerija" class="bg-cream pb-20 lg:pb-28" aria-labelledby="galerija-title">
+{/* Positioned above the hero photo, which is sticky at z-0 and can hang up to
+    a screen below its wrapper; otherwise it shows through this background. */}
+<section id="galerija" class="relative z-10 bg-cream pb-20 lg:pb-28" aria-labelledby="galerija-title">
   <SectionDivider class="mb-12 lg:mb-16" />
   <div class="mx-auto max-w-7xl px-4">
     <SectionHeading id="galerija-title" title={copy.gallery.heading} intro={copy.gallery.intro} />
 
     <flora-gallery class="mt-10 block">
-      <div
-        class="js-only sticky top-16 z-20 -mx-4 bg-cream/95 px-3 py-2 backdrop-blur-sm lg:static lg:bg-transparent lg:backdrop-blur-none"
-        role="group"
-        aria-label={copy.gallery.filterLabel}
-      >
-        <div class="flora-chips flex gap-2 overflow-x-auto p-1 lg:flex-wrap lg:justify-center lg:overflow-visible">
-          <button type="button" class="flora-chip" data-filter="*" aria-pressed="true">
-            {copy.gallery.filterAll}
-          </button>
-          {chips.map((c) => (
-            <button type="button" class="flora-chip" data-filter={c.id} aria-pressed="false">
-              {c.name}
+      <div class="js-only sticky top-16 z-20 -mx-4 bg-cream/95 py-2 backdrop-blur-sm lg:static lg:bg-transparent lg:backdrop-blur-none">
+        <div class="flora-chips-frame relative" data-reveal>
+          <div
+            class="flora-chips flex gap-2 overflow-x-auto px-4 py-1 lg:flex-wrap lg:justify-center lg:overflow-visible"
+            role="toolbar"
+            aria-label={copy.gallery.filterLabel}
+            data-chips
+          >
+            <button type="button" class="flora-chip" data-filter="*" aria-pressed="true" tabindex="0">
+              {copy.gallery.filterAll}
             </button>
-          ))}
+            {chips.map((c) => (
+              <button type="button" class="flora-chip" data-filter={c.id} aria-pressed="false" tabindex="-1">
+                {c.name}
+              </button>
+            ))}
+          </div>
+          {/* Scroll affordances: shown only while the row overflows (see script). */}
+          <span class="flora-chips-fade flora-chips-fade-start" aria-hidden="true"></span>
+          <span class="flora-chips-fade flora-chips-fade-end" aria-hidden="true"></span>
+          <span class="flora-chips-hint flora-chips-hint-start" aria-hidden="true"><Icon name="chevron-left" /></span>
+          <span class="flora-chips-hint flora-chips-hint-end" aria-hidden="true"><Icon name="chevron-right" /></span>
         </div>
       </div>
 
       <div class="flora-masonry-wrap mt-4 lg:mt-8">
-        <ul class="flora-masonry flora-gallery-grid" role="list">
+        <ul class="flora-masonry flora-gallery-grid" role="list" data-reveal-stagger>
           {items.map((item) => (
             <li style={`--span: ${item.span}`} data-category={item.category}>
               <a
@@ -74,7 +85,7 @@ const items = await Promise.all(
                 data-w={item.w}
                 data-h={item.h}
                 data-alt={item.alt}
-                class:list={["flora-panel flora-tile group relative block overflow-hidden rounded", item.well]}
+                class:list={["flora-panel group relative block overflow-hidden rounded", item.well]}
                 style={`aspect-ratio: ${item.w} / ${item.h}`}
                 aria-label={`${copy.gallery.open} ${item.alt}`}
               >
@@ -84,6 +95,7 @@ const items = await Promise.all(
                   widths={thumbWidths}
                   sizes={thumbSizes}
                   quality={68}
+                  reveal
                   class="block h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                 />
               </a>
@@ -100,7 +112,8 @@ const items = await Promise.all(
 <style>
   .flora-chips {
     scrollbar-width: none;
-    scroll-snap-type: x proximity;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1rem;
   }
   .flora-chips::-webkit-scrollbar {
     display: none;
@@ -129,40 +142,83 @@ const items = await Promise.all(
     border-color: var(--color-rose-ink);
     color: var(--color-cream);
   }
-  .flora-gallery-grid {
-    transition: opacity 0.18s ease;
+
+  /* Edge fades: cream overlays over whichever edge hides more chips. Opacity
+     only, so toggling them never repaints the row. */
+  .flora-chips-fade,
+  .flora-chips-hint {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .flora-chips-fade {
+    width: 3rem;
+  }
+  .flora-chips-fade-start {
+    left: 0;
+    background: linear-gradient(to right, var(--color-cream) 20%, rgb(251 247 242 / 0));
+  }
+  .flora-chips-fade-end {
+    right: 0;
+    background: linear-gradient(to left, var(--color-cream) 20%, rgb(251 247 242 / 0));
+  }
+  .flora-chips-frame.fade-start .flora-chips-fade-start,
+  .flora-chips-frame.fade-end .flora-chips-fade-end {
+    opacity: 1;
   }
 
-  /* Enter: tile fades in while its photo settles from 1.04 to 1. Rows are staggered
-     via --flora-row-delay. Fill is "backwards" so the hover zoom still works after. */
-  :global(.js) .flora-tile {
-    opacity: 0;
+  /* Chevron on the overflowing side, nudging until the row has been scrolled. */
+  .flora-chips-hint {
+    display: flex;
+    align-items: center;
+    color: var(--color-rose-ink);
   }
-  .flora-tile.is-in {
+  .flora-chips-hint-start {
+    left: 0.125rem;
+  }
+  .flora-chips-hint-end {
+    right: 0.125rem;
+  }
+  .flora-chips-frame.hint-start .flora-chips-hint-start,
+  .flora-chips-frame.hint-end .flora-chips-hint-end {
     opacity: 1;
-    animation: flora-tile-fade 0.9s ease-out var(--flora-row-delay, 0ms) backwards;
   }
-  .flora-tile.is-in :global(img) {
-    animation: flora-tile-settle 1.4s cubic-bezier(0.22, 1, 0.36, 1) var(--flora-row-delay, 0ms) backwards;
+  .flora-chips-hint :global(svg) {
+    animation: flora-chip-nudge 1.4s ease-in-out infinite;
+    animation-play-state: paused;
   }
-  @keyframes flora-tile-fade {
-    from {
-      opacity: 0;
+  .flora-chips-hint-start :global(svg) {
+    animation-direction: reverse;
+  }
+  .flora-chips-frame.in-view.hint-start .flora-chips-hint-start :global(svg),
+  .flora-chips-frame.in-view.hint-end .flora-chips-hint-end :global(svg) {
+    animation-play-state: running;
+  }
+  /* The nudge must never push past the viewport edge. */
+  .flora-chips-frame {
+    overflow-x: clip;
+  }
+  @keyframes flora-chip-nudge {
+    0%,
+    60%,
+    100% {
+      transform: translateX(0);
     }
-  }
-  @keyframes flora-tile-settle {
-    from {
-      transform: scale(1.04);
+    30% {
+      transform: translateX(4px);
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    :global(.js) .flora-tile {
-      opacity: 1;
-    }
-    .flora-tile.is-in,
-    .flora-tile.is-in :global(img) {
+    .flora-chips-hint :global(svg) {
       animation: none;
     }
+  }
+
+  .flora-gallery-grid {
+    transition: opacity 0.18s ease;
   }
   .flora-gallery-grid.is-filtering {
     opacity: 0;
@@ -173,47 +229,101 @@ const items = await Promise.all(
   class FloraGallery extends HTMLElement {
     connectedCallback() {
       const grid = this.querySelector<HTMLElement>(".flora-gallery-grid");
-      const bar = this.querySelector<HTMLElement>("[role=group]");
+      const bar = this.querySelector<HTMLElement>(".flora-chips-frame")?.parentElement;
+      const frame = this.querySelector<HTMLElement>(".flora-chips-frame");
+      const row = this.querySelector<HTMLElement>("[data-chips]");
       const chips = [...this.querySelectorAll<HTMLButtonElement>("[data-filter]")];
-      if (!grid || !bar) return;
+      if (!grid || !bar || !frame || !row) return;
       const tiles = [...grid.children] as HTMLElement[];
       const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      // Enter animation, once per tile. Tiles arriving together are grouped into
-      // visual rows by their top edge; each row starts 90ms after the one above.
-      const enter = new IntersectionObserver(
-        (entries) => {
-          const arriving = entries
-            .filter((e) => e.isIntersecting)
-            .map((e) => ({ el: e.target as HTMLElement, top: e.boundingClientRect.top }))
-            .sort((a, b) => a.top - b.top);
-          let row = -1;
-          let rowTop = -Infinity;
-          for (const { el, top } of arriving) {
-            if (top - rowTop > 48) {
-              row += 1;
-              rowTop = top;
-            }
-            el.style.setProperty("--flora-row-delay", `${row * 90}ms`);
-            el.classList.add("is-in");
-            enter.unobserve(el);
-          }
-        },
-        { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
-      );
-      for (const li of tiles) {
-        const tile = li.querySelector<HTMLElement>(".flora-tile");
-        if (tile) enter.observe(tile);
-      }
+      // ── Scroll affordances ─────────────────────────────────
+      let userScrolled = false;
+      let programmatic = false;
 
+      const updateHints = () => {
+        const max = row.scrollWidth - row.clientWidth;
+        const overflowing = max > 1;
+        const hiddenStart = overflowing && row.scrollLeft > 1;
+        const hiddenEnd = overflowing && row.scrollLeft < max - 1;
+        frame.classList.toggle("fade-start", hiddenStart);
+        frame.classList.toggle("fade-end", hiddenEnd);
+        // One chevron, on the side there is more to see; gone after the first
+        // scroll or once the end is reached.
+        const hint = overflowing && !userScrolled;
+        frame.classList.toggle("hint-end", hint && hiddenEnd);
+        frame.classList.toggle("hint-start", hint && !hiddenEnd && hiddenStart);
+      };
+
+      /** Scrolls the chip row (never the page) so `chip` is fully visible. */
+      const reveal = (chip: HTMLElement, behavior: ScrollBehavior) => {
+        const pad = 16;
+        const left = chip.offsetLeft - pad;
+        const right = chip.offsetLeft + chip.offsetWidth + pad - row.clientWidth;
+        const target = row.scrollLeft > left ? left : row.scrollLeft < right ? right : null;
+        if (target === null) return;
+        if (behavior === "instant") {
+          // Not the user's doing — keep the hint.
+          programmatic = true;
+          requestAnimationFrame(() => (programmatic = false));
+        }
+        row.scrollTo({ left: target, behavior: reduced ? "instant" : behavior });
+      };
+
+      let queued = false;
+      row.addEventListener(
+        "scroll",
+        () => {
+          if (!programmatic) userScrolled = true;
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(() => {
+            queued = false;
+            updateHints();
+          });
+        },
+        { passive: true },
+      );
+      new ResizeObserver(updateHints).observe(row);
+      // The nudge only runs while the chips are on screen.
+      new IntersectionObserver(([entry]) => frame.classList.toggle("in-view", entry.isIntersecting)).observe(frame);
+
+      // ── Keyboard: one tab stop, arrows move between chips ─
+      const focusChip = (chip: HTMLButtonElement) => {
+        for (const c of chips) c.tabIndex = c === chip ? 0 : -1;
+        chip.focus({ preventScroll: true });
+        reveal(chip, "smooth");
+      };
+      row.addEventListener("keydown", (e) => {
+        const i = chips.indexOf(document.activeElement as HTMLButtonElement);
+        if (i === -1) return;
+        const next =
+          e.key === "ArrowRight" ? chips[Math.min(i + 1, chips.length - 1)]
+          : e.key === "ArrowLeft" ? chips[Math.max(i - 1, 0)]
+          : e.key === "Home" ? chips[0]
+          : e.key === "End" ? chips[chips.length - 1]
+          : null;
+        if (!next) return;
+        e.preventDefault();
+        focusChip(next);
+      });
+
+      // ── Filtering ─────────────────────────────────────────
       const apply = (filter: string) => {
         for (const li of tiles) li.hidden = filter !== "*" && li.dataset.category !== filter;
+      };
+
+      const press = (chip: HTMLButtonElement) => {
+        for (const c of chips) {
+          c.setAttribute("aria-pressed", String(c === chip));
+          c.tabIndex = c === chip ? 0 : -1;
+        }
       };
 
       for (const chip of chips) {
         chip.addEventListener("click", () => {
           if (chip.getAttribute("aria-pressed") === "true") return;
-          for (const c of chips) c.setAttribute("aria-pressed", String(c === chip));
+          press(chip);
 
           // Keep the chips where the thumb is: if the bar is stuck, bring the
           // grid top back under it so a shorter result can't strand the viewport.
@@ -234,6 +344,22 @@ const items = await Promise.all(
           setTimeout(swap, 180);
         });
       }
+
+      // Service cards link here with a category: select it, then let the
+      // link's own #galerija jump bring the section into view.
+      document.addEventListener("click", (e) => {
+        const link = (e.target as Element).closest<HTMLElement>("[data-gallery-filter]");
+        if (!link) return;
+        const chip = chips.find((c) => c.dataset.filter === link.dataset.galleryFilter) ?? chips[0];
+        press(chip);
+        apply(chip.dataset.filter ?? "*");
+        reveal(chip, "instant");
+      });
+
+      // The selected chip starts in view.
+      const active = chips.find((c) => c.getAttribute("aria-pressed") === "true");
+      if (active) reveal(active, "instant");
+      updateHints();
     }
   }
 

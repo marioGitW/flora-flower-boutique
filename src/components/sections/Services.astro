@@ -1,11 +1,10 @@
 ---
 import { getCollection } from "astro:content";
-import { site } from "../../data/site";
 import { copy } from "../../data/copy";
 import Reveal from "../motion/Reveal.astro";
+import Icon from "../ui/Icon.astro";
 import BloomSvg from "../motion/BloomSvg.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
-import OrderSheet from "../ui/OrderSheet.astro";
 import SectionDivider from "../ui/SectionDivider.astro";
 import DeferredPicture from "../ui/DeferredPicture.astro";
 
@@ -39,60 +38,60 @@ const cards = services.map((s, i) => ({
       </Reveal>
     </div>
 
-    <ul class="mt-12 grid grid-cols-2 gap-3 sm:gap-4 lg:mt-16 lg:grid-cols-4 lg:gap-5" role="list">
+    {/* Each card is one link into the gallery, filtered to that service. Cards
+        without photos yet open the full gallery. Without JS: a plain jump. */}
+    <ul class="mt-12 grid grid-cols-2 gap-3 sm:gap-4 lg:mt-16 lg:grid-cols-4 lg:gap-5" role="list" data-reveal-stagger>
       {cards.map((card, i) => (
-        <li class:list={[card.wide && "lg:col-span-2"]}>
-          <Reveal delay={(i % 4) * 70} fill>
-            <a
-              href={site.phoneHref}
-              data-order={card.name}
+        <li class:list={[card.wide && "lg:col-span-2"]} data-reveal>
+          <a
+            href="#galerija"
+            data-gallery-filter={card.id}
+            aria-label={`${card.name}: ${copy.services.cardAction}`}
+            aria-describedby={`usluga-${card.id}`}
+            class:list={[
+              "group flex h-full flex-col overflow-hidden rounded-lg bg-white/60 shadow-[0_1px_0_rgb(58_51_48/0.06)] ring-1 ring-ink/5 transition-[box-shadow,background-color] duration-200 hover:bg-white hover:shadow-md hover:ring-rose/40 focus-visible:bg-white focus-visible:shadow-md",
+              card.wide && "lg:flex-row",
+            ]}
+          >
+            <div
               class:list={[
-                "group flex h-full flex-col overflow-hidden rounded-lg bg-white/60 shadow-[0_1px_0_rgb(58_51_48/0.06)] ring-1 ring-ink/5 transition-shadow hover:shadow-md",
-                card.wide && "lg:flex-row",
+                "flora-panel relative aspect-[4/5] overflow-hidden",
+                card.well,
+                card.wide && "lg:aspect-auto lg:w-1/2 lg:min-h-80",
               ]}
             >
-              <div
-                class:list={[
-                  "flora-panel relative aspect-[4/5] overflow-hidden",
-                  card.well,
-                  card.wide && "lg:aspect-auto lg:w-1/2 lg:min-h-80",
-                ]}
-              >
-                {card.photo ? (
-                  <DeferredPicture
-                    src={card.photo.src}
-                    alt=""
-                    widths={[200, 320, 480, 600]}
-                    sizes={card.wide ? "(min-width: 1024px) 280px, 46vw" : "(min-width: 1024px) 270px, 46vw"}
-                    quality={55}
-                    class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                  />
-                ) : (
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <BloomSvg size={72} petalCount={i % 2 ? 5 : 6} color={i % 2 ? "var(--color-sage)" : "var(--color-rose)"} />
-                  </div>
-                )}
-              </div>
-              <div class:list={["flex flex-1 flex-col p-3 sm:p-4", card.wide && "lg:justify-center lg:p-8"]}>
-                <h3 class:list={["font-display text-lg leading-snug text-ink sm:text-xl", card.wide && "lg:text-3xl"]}>
-                  {card.name}
-                </h3>
-                <p class:list={["mt-1.5 text-sm leading-relaxed text-ink/80", card.wide && "lg:mt-3 lg:text-base"]}>
-                  {card.description}
-                </p>
-                <span class="mt-auto pt-3">
-                  <span class="inline-flex items-center gap-1 rounded-full bg-rose-ink px-3 py-1.5 text-sm font-medium text-cream transition-colors group-hover:bg-rose-ink-hover">
-                    {copy.services.orderLabel}
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" /></svg>
-                  </span>
-                </span>
-              </div>
-            </a>
-          </Reveal>
+              {card.photo ? (
+                <DeferredPicture
+                  src={card.photo.src}
+                  alt=""
+                  widths={[200, 320, 480, 600]}
+                  sizes={card.wide ? "(min-width: 1024px) 280px, 46vw" : "(min-width: 1024px) 270px, 46vw"}
+                  quality={55}
+                  reveal
+                  class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] group-focus-visible:scale-[1.03]"
+                />
+              ) : (
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <BloomSvg size={72} petalCount={i % 2 ? 5 : 6} color={i % 2 ? "var(--color-sage)" : "var(--color-rose)"} />
+                </div>
+              )}
+            </div>
+            <div class:list={["flex flex-1 flex-col p-3 sm:p-4", card.wide && "lg:justify-center lg:p-8"]}>
+              <h3 class:list={["font-display text-lg leading-snug text-ink sm:text-xl", card.wide && "lg:text-3xl"]}>
+                {card.name}
+              </h3>
+              <p id={`usluga-${card.id}`} class:list={["mt-1.5 text-sm leading-relaxed text-ink/80", card.wide && "lg:mt-3 lg:text-base"]}>
+                {card.description}
+              </p>
+              {/* Quiet cue that the card leads somewhere; nudges on hover/focus. */}
+              <Icon
+                name="arrow"
+                class="mt-auto self-end pt-2 text-rose-ink transition-transform duration-200 group-hover:translate-x-1 group-focus-visible:translate-x-1"
+              />
+            </div>
+          </a>
         </li>
       ))}
     </ul>
   </div>
-
-  <OrderSheet />
 </section>

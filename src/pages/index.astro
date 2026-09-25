@@ -8,6 +8,7 @@ import Gallery from "../components/sections/Gallery.astro";
 import HowToOrder from "../components/sections/HowToOrder.astro";
 import About from "../components/sections/About.astro";
 import Contact from "../components/sections/Contact.astro";
+import ContactLinks from "../components/ui/ContactLinks.astro";
 import { site } from "../data/site";
 import { copy } from "../data/copy";
 ---
@@ -28,18 +29,10 @@ import { copy } from "../data/copy";
   </main>
 
   <footer class="flora-footer bg-ink py-12 text-cream/80">
-    <div class="mx-auto max-w-6xl px-4 text-center">
+    <div class="mx-auto max-w-6xl px-4 text-center" data-reveal>
       <p class="font-display text-2xl text-cream">{site.name}</p>
       <p class="mt-1 font-display">{site.tagline}</p>
-      <ul class="mt-5 flex flex-wrap items-center justify-center gap-x-6 text-sm" role="list">
-        <li><a href={site.phoneHref} class="inline-block py-2 transition-colors hover:text-cream">{site.phoneFormatted}</a></li>
-        <li><a href={site.viberHref} class="inline-block py-2 transition-colors hover:text-cream">{copy.contact.viber}</a></li>
-        <li>
-          <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class="inline-block py-2 transition-colors hover:text-cream">
-            {copy.contact.instagram}
-          </a>
-        </li>
-      </ul>
+      <ContactLinks channels={["phone", "viber", "whatsapp", "instagram"]} size="md" class="mt-6 justify-center" />
       <p class="mt-6 text-xs text-cream/75">
         &copy; {new Date().getFullYear()} {site.nameFull}. {copy.footer.rights}
       </p>

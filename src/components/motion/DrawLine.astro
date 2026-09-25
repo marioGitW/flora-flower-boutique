@@ -1,12 +1,15 @@
 ---
 interface Props {
   class?: string;
-  variant?: "curve" | "botanical";
+  /** `vertical` fills its box top to bottom (size it with classes), e.g. a timeline spine. */
+  variant?: "curve" | "botanical" | "vertical";
   /** Delay before drawing starts, ms. */
   delay?: number;
+  /** Draw time, ms. Only for `vertical`, so it can be paced to what it connects. */
+  duration?: number;
 }
 
-const { class: className = "", variant = "curve", delay = 0 } = Astro.props;
+const { class: className = "", variant = "curve", delay = 0, duration = 1400 } = Astro.props;
 
 type Pt = [number, number];
 type Seg = [Pt, Pt, Pt, Pt];
@@ -54,6 +57,16 @@ if (variant === "botanical") {
 }
 ---
 
+{variant === "vertical" ? (
+  // Grows downward by scaleY: transform only, so it never repaints while drawing.
+  <flora-draw-line
+    class={`block ${className}`}
+    style={`--flora-draw-delay: ${delay}ms; --flora-draw-duration: ${duration}ms`}
+    aria-hidden="true"
+  >
+    <span class="flora-draw-stem"></span>
+  </flora-draw-line>
+) : (
 <flora-draw-line class={`block ${className}`} style={`--flora-draw-delay: ${delay}ms`}>
   <svg viewBox={viewBox} fill="none" aria-hidden="true" class="h-auto w-full overflow-visible">
     <path
@@ -83,6 +96,7 @@ if (variant === "botanical") {
     )}
   </svg>
 </flora-draw-line>
+)}
 
 <style>
   /* Drawn by default (no JS, reduced motion); hidden only when JS will draw it. */
@@ -102,7 +116,30 @@ if (variant === "botanical") {
     animation: flora-fade-rise 0.6s ease-out calc(var(--flora-draw-delay, 0ms) + 700ms) forwards;
     --flora-rise-distance: 0px;
   }
+  .flora-draw-stem {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--color-sage);
+    transform-origin: top;
+  }
+  :global(.js) .flora-draw-stem {
+    transform: scaleY(0);
+  }
+  flora-draw-line[data-drawn] .flora-draw-stem {
+    animation: flora-draw-stem var(--flora-draw-duration) cubic-bezier(0.45, 0, 0.55, 1) var(--flora-draw-delay, 0ms) forwards;
+  }
+  @keyframes flora-draw-stem {
+    to {
+      transform: scaleY(1);
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
+    :global(.js) .flora-draw-stem {
+      transform: none;
+      animation: none !important;
+    }
     :global(.js) flora-draw-line :global(.flora-draw-path) {
       stroke-dashoffset: 0;
       animation: none !important;
@@ -115,23 +152,27 @@ if (variant === "botanical") {
 </style>
 
 <script>
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        (entry.target as HTMLElement).dataset.drawn = "";
-        observer.unobserve(entry.target);
-      }
-    },
-    { threshold: 0.4 },
-  );
+  const draw: IntersectionObserverCallback = (entries, observer) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      (entry.target as HTMLElement).dataset.drawn = "";
+      observer.unobserve(entry.target);
+    }
+  };
+  const observer = new IntersectionObserver(draw, { threshold: 0.4 });
+  // Tall vertical lines may never reach 40% visible; start them when their top
+  // edge comes into view, the same moment scroll reveals fire.
+  const stemObserver = new IntersectionObserver(draw, { rootMargin: "0px 0px -12% 0px" });
 
   class FloraDrawLine extends HTMLElement {
+    get observer() {
+      return this.querySelector(".flora-draw-stem") ? stemObserver : observer;
+    }
     connectedCallback() {
-      observer.observe(this);
+      this.observer.observe(this);
     }
     disconnectedCallback() {
-      observer.unobserve(this);
+      this.observer.unobserve(this);
     }
   }
 

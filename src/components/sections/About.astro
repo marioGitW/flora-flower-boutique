@@ -1,12 +1,17 @@
 ---
 import { copy } from "../../data/copy";
 import { images } from "../../data/images";
-import Reveal from "../motion/Reveal.astro";
+import DrawLine from "../motion/DrawLine.astro";
 import BloomSvg from "../motion/BloomSvg.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import DeferredPicture from "../ui/DeferredPicture.astro";
 
 const t = copy.about;
+
+// Nodes appear one after another; the spine is timed to reach the last node
+// as it appears (see data-reveal-stagger in src/scripts/reveal.ts).
+const STEP_MS = 180;
+const spineMs = (t.steps.length - 1) * STEP_MS + 400;
 ---
 
 <section id="za-nas" class="bg-butter/40 lg:grid lg:min-h-[90svh] lg:grid-cols-2" aria-labelledby="za-nas-title">
@@ -18,20 +23,43 @@ const t = copy.about;
       widths={[390, 560, 727]}
       sizes="(min-width: 1024px) 50vw, 100vw"
       quality={65}
+      reveal
       class="absolute inset-0 h-full w-full object-cover object-[50%_40%]"
     />
   </div>
 
   <div class="flex items-center px-4 py-16 sm:py-20 lg:px-16 lg:py-24 xl:px-24">
-    <div class="mx-auto max-w-md lg:mx-0 lg:max-w-lg">
+    <div class="mx-auto w-full max-w-md lg:mx-0 lg:max-w-lg">
       <SectionHeading id="za-nas-title" title={t.heading} alignLeftLg />
-      <div class="mt-8 space-y-4 text-center text-lg leading-relaxed text-ink/85 lg:text-left">
-        {t.paragraphs.map((p, i) => (
-          <Reveal delay={140 + i * 70}>
-            <p class:list={[i === 0 && "font-display text-2xl leading-snug text-ink"]}>{p}</p>
-          </Reveal>
-        ))}
+      <p class="mt-6 text-center font-display text-xl leading-snug text-ink lg:text-left lg:text-2xl" data-reveal style="--reveal-delay: 140ms">
+        {t.lead}
+      </p>
+
+      <div class="mx-auto mt-10 w-fit lg:mx-0">
+        <p id="za-nas-steps" class="text-xs font-semibold uppercase tracking-[0.18em] text-rose-ink" data-reveal style="--reveal-delay: 200ms">
+          {t.stepsLabel}
+        </p>
+
+        <div class="relative mt-5">
+          {/* Rows are a fixed 48px with the dot centred, so the spine runs exactly
+              from the first dot's centre (24px down) to the last one's. */}
+          <DrawLine variant="vertical" duration={spineMs} class="absolute bottom-6 left-[0.6875rem] top-6 w-0.5" />
+          <ol class="relative space-y-4" aria-labelledby="za-nas-steps" data-reveal-stagger={STEP_MS}>
+            {t.steps.map((step) => (
+              <li class="flex h-12 items-center gap-4" data-reveal>
+                <span class="flex h-6 w-6 flex-none items-center justify-center rounded-full bg-cream ring-2 ring-rose" aria-hidden="true">
+                  <span class="h-2 w-2 rounded-full bg-rose-ink"></span>
+                </span>
+                <p class="whitespace-nowrap leading-tight">
+                  <span class="block font-display text-xl text-ink">{step.title}</span>
+                  <span class="mt-0.5 block text-[0.9375rem] text-ink/75">{step.text}</span>
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
+
       <div class="mt-10 flex justify-center lg:justify-start">
         <BloomSvg size={56} petalCount={8} />
       </div>

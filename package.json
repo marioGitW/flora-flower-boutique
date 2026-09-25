@@ -7,21 +7,23 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "icons": "node scripts/generate-icons.mjs",
     "format": "prettier --write \"src/**/*.{astro,ts,tsx,css,json}\"",
     "lighthouse": "npx lighthouse http://localhost:4321 --output html --output-path ./lighthouse-report.html --chrome-flags=\"--headless\""
   },
   "dependencies": {
-    "astro": "^5.7.0",
     "@astrojs/sitemap": "^3.2.0",
+    "@fontsource-variable/inter": "^5.1.0",
     "@fontsource-variable/playfair-display": "^5.1.0",
-    "@fontsource-variable/inter": "^5.1.0"
+    "@iconify-json/material-symbols": "^1.2.93",
+    "@iconify-json/simple-icons": "^1.2.97",
+    "astro": "^5.7.0",
+    "astro-icon": "^1.2.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.0",
-    "tailwindcss": "^4.1.0",
-    "typescript": "^5.7.0",
     "prettier": "^3.4.0",
-    "prettier-plugin-astro": "^0.14.0"
+    "prettier-plugin-astro": "^0.14.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.7.0"
   }
 }

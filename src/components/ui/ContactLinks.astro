@@ -1,0 +1,68 @@
+---
+import { site } from "../../data/site";
+import { copy } from "../../data/copy";
+import type { IconName } from "../../data/icons";
+import Icon from "./Icon.astro";
+
+/**
+ * Icon-only links that open each channel directly. No visible text, so every
+ * link carries an aria-label; targets are never smaller than 48px.
+ */
+type Channel = "phone" | "viber" | "whatsapp" | "instagram";
+
+interface Props {
+  channels: Channel[];
+  /** lg: 56px circles (contact section), md: 48px (footer). */
+  size?: "md" | "lg";
+  class?: string;
+}
+
+const { channels, size = "lg", class: className = "" } = Astro.props;
+const t = copy.contact;
+
+const links: Record<Channel, { href: string; label: string; icon: IconName; fill: string; external?: boolean }> = {
+  phone: {
+    href: site.phoneHref,
+    label: `${t.phoneAction} ${site.phoneFormatted}`,
+    icon: "phone",
+    fill: "bg-rose-ink hover:bg-rose-ink-hover",
+  },
+  viber: { href: site.viberHref, label: t.viberAction, icon: "viber", fill: "bg-viber hover:bg-viber-hover" },
+  whatsapp: {
+    href: site.whatsappHref,
+    label: t.whatsappAction,
+    icon: "whatsapp",
+    fill: "bg-whatsapp hover:bg-whatsapp-hover",
+    external: true,
+  },
+  instagram: {
+    href: site.instagramDmHref,
+    label: t.instagramAction,
+    icon: "instagram",
+    fill: "bg-instagram hover:bg-instagram-hover",
+    external: true,
+  },
+};
+---
+
+<ul class:list={["flex flex-wrap items-center", size === "lg" ? "gap-3" : "gap-2.5", className]} role="list">
+  {channels.map((c) => {
+    const l = links[c];
+    return (
+      <li>
+        <a
+          href={l.href}
+          aria-label={l.label}
+          {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          class:list={[
+            "flex items-center justify-center rounded-full text-cream shadow-sm transition-[background-color,transform] duration-200 hover:-translate-y-0.5 active:translate-y-0",
+            size === "lg" ? "h-14 w-14" : "h-12 w-12",
+            l.fill,
+          ]}
+        >
+          <Icon name={l.icon} size={size === "lg" ? "xl" : "lg"} />
+        </a>
+      </li>
+    );
+  })}
+</ul>

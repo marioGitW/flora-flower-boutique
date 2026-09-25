@@ -1,0 +1,27 @@
+---
+import { Icon as AstroIcon } from "astro-icon/components";
+import { icons, type IconName } from "../../data/icons";
+
+/**
+ * The one icon component. Inlined as SVG at build time, no client JS.
+ * Always decorative: the link or button around it carries the accessible name.
+ * Colour comes from currentColor.
+ */
+interface Props {
+  name: IconName;
+  size?: keyof typeof sizes;
+  class?: string;
+}
+
+const sizes = { sm: 16, md: 20, lg: 24, xl: 28 } as const;
+
+const { name, size = "md", class: className = "" } = Astro.props;
+const px = sizes[size];
+const id = icons[name];
+
+// Material glyphs sit inside a ~20/24 live area; Simple Icons fill the whole
+// 24 box. Insetting brand marks by 1/12 puts both at the same optical size.
+const inset = id.startsWith("simple-icons:") ? `padding: ${px / 12}px` : undefined;
+---
+
+<AstroIcon name={id} size={px} class:list={["flex-none", className]} style={inset} aria-hidden="true" focusable="false" />

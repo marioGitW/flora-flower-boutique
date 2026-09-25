@@ -1,12 +1,12 @@
 ---
 import { site } from "../../data/site";
-import ContactIcon from "./ContactIcon.astro";
+import Icon from "./Icon.astro";
 import { copy } from "../../data/copy";
 ---
 
 <div
   id="flora-sticky-call"
-  class="fixed inset-x-0 bottom-0 z-40 flex gap-3 bg-cream/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-2px_12px_rgba(58,51,48,0.08)] backdrop-blur-sm transition-transform duration-300 ease-out md:hidden"
+  class="fixed inset-x-0 bottom-0 z-40 flex gap-3 bg-cream/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-2px_12px_rgba(58,51,48,0.08)] backdrop-blur-sm transition-transform duration-300 ease-out motion-reduce:transition-none md:hidden"
   role="navigation"
   aria-label={copy.nav.quickContact}
 >
@@ -14,14 +14,14 @@ import { copy } from "../../data/copy";
     href={site.phoneHref}
     class="flex min-h-12 flex-1 items-center justify-center gap-2 rounded bg-rose-ink text-base font-medium text-cream transition-colors hover:bg-rose-ink-hover active:bg-rose-ink-hover"
   >
-    <ContactIcon name="phone" />
+    <Icon name="phone" />
     {copy.nav.stickyCall}
   </a>
   <a
     href={site.viberHref}
     class="flex min-h-12 flex-1 items-center justify-center gap-2 rounded bg-viber text-base font-medium text-cream transition-colors hover:bg-viber-hover active:bg-viber-hover"
   >
-    <ContactIcon name="viber" />
+    <Icon name="viber" />
     {copy.nav.stickyViber}
   </a>
 </div>
@@ -30,21 +30,66 @@ import { copy } from "../../data/copy";
 <div class="h-[76px] md:hidden" aria-hidden="true"></div>
 
 <style>
-  #flora-sticky-call.is-tucked {
+  /* Without JS the bar simply stays put; with JS it is shown only when the script says so. */
+  :global(.js) #flora-sticky-call:not(.is-shown) {
     transform: translateY(110%);
   }
 </style>
 
 <script>
-  // While the hero's own call/Viber buttons are on screen the bar would only
-  // duplicate them; it slides in as soon as they scroll away.
+  // Shown only while it is useful: never while the hero's own call/Viber buttons
+  // are on screen, tucked away after a short run of scrolling down (reading),
+  // back on any scroll up (looking for how to get in touch).
   const bar = document.getElementById("flora-sticky-call");
   const heroCtas = document.querySelector("[data-hero-ctas]");
 
-  if (bar && heroCtas) {
-    new IntersectionObserver(([entry]) => {
-      bar.classList.toggle("is-tucked", entry.isIntersecting);
-      bar.toggleAttribute("inert", entry.isIntersecting);
-    }).observe(heroCtas);
+  if (bar) {
+    const HIDE_AFTER = 80; // px of uninterrupted downward scroll
+    let heroVisible = !!heroCtas; // until the observer reports; pages open at the top
+    let hiddenByScroll = false;
+    let lastY = Math.max(0, window.scrollY);
+    let down = 0;
+    let queued = false;
+
+    const render = () => {
+      // Never slide away from under keyboard focus.
+      const show = !heroVisible && (!hiddenByScroll || bar.matches(":focus-within"));
+      bar.classList.toggle("is-shown", show);
+      bar.toggleAttribute("inert", !show);
+    };
+
+    // One read per frame at most, however many scroll events arrive.
+    const update = () => {
+      queued = false;
+      const y = Math.max(0, window.scrollY); // iOS overscroll reports negatives
+      const dy = y - lastY;
+      lastY = y;
+      if (dy < 0) {
+        down = 0;
+        hiddenByScroll = false;
+      } else if (dy > 0) {
+        down += dy;
+        if (down > HIDE_AFTER) hiddenByScroll = true;
+      }
+      render();
+    };
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(update);
+      },
+      { passive: true },
+    );
+
+    if (heroCtas) {
+      new IntersectionObserver(([entry]) => {
+        heroVisible = entry.isIntersecting;
+        render();
+      }).observe(heroCtas);
+    }
+    render();
   }
 </script>

@@ -1,15 +1,17 @@
 ---
 import { site } from "../../data/site";
 import { copy } from "../../data/copy";
-import ContactIcon from "./ContactIcon.astro";
+import Icon from "./Icon.astro";
+import Logo from "./Logo.astro";
 
 const t = copy.nav;
 ---
 
 <header id="flora-header" class="fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow] duration-300 lg:bg-cream/90 lg:backdrop-blur-sm">
   <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4">
-    <a href="#pocetok" class="font-display text-2xl text-ink" aria-label={t.home} data-nav-logo>
-      {site.name}
+    {/* 40px tall in a 64px bar: 12px clear space above and below. */}
+    <a href="#pocetok" class="-mx-1 flex-none rounded px-1 py-1" aria-label={t.home} data-nav-logo>
+      <Logo variant="wordmark" height={40} loading="eager" />
     </a>
 
     <nav class="hidden items-center gap-6 md:flex" aria-label={t.label}>
@@ -22,7 +24,7 @@ const t = copy.nav;
       href={site.phoneHref}
       class="hidden min-h-10 items-center gap-2 rounded-full bg-rose-ink px-4 text-sm font-medium text-cream transition-colors hover:bg-rose-ink-hover md:inline-flex"
     >
-      <ContactIcon name="phone" size={16} />
+      <Icon name="phone" size="sm" />
       {t.headerCall} {site.phoneFormatted}
     </a>
 
@@ -36,7 +38,10 @@ const t = copy.nav;
       data-label-close={t.close}
       id="flora-menu-toggle"
     >
-      <span class="flora-burger" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="flora-burger relative text-ink" aria-hidden="true">
+        <Icon name="menu" size="lg" class="flora-burger-open" />
+        <Icon name="close" size="lg" class="flora-burger-close absolute inset-0" />
+      </span>
     </button>
   </div>
 
@@ -57,46 +62,30 @@ const t = copy.nav;
       </ul>
     </nav>
     <a href={site.phoneHref} class="flora-nav-link mt-2 inline-flex min-h-12 items-center gap-2 rounded bg-rose-ink px-6 text-base font-medium text-cream">
-      <ContactIcon name="phone" />
+      <Icon name="phone" />
       {copy.hero.callLabel} {site.phoneFormatted}
     </a>
   </div>
 </header>
 
 <style>
-  .flora-burger {
-    position: relative;
-    width: 22px;
-    height: 14px;
-  }
-  .flora-burger span {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 1.5px;
-    border-radius: 2px;
-    background: var(--color-ink);
+  /* Menu and close glyphs cross-fade with a quarter turn. */
+  .flora-burger :global(svg) {
     transition:
       transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
       opacity 0.2s;
   }
-  .flora-burger span:nth-child(1) {
-    top: 0;
-  }
-  .flora-burger span:nth-child(2) {
-    top: 6.25px;
-  }
-  .flora-burger span:nth-child(3) {
-    top: 12.5px;
-  }
-  [aria-expanded="true"] .flora-burger span:nth-child(1) {
-    transform: translateY(6.25px) rotate(45deg);
-  }
-  [aria-expanded="true"] .flora-burger span:nth-child(2) {
+  .flora-burger :global(.flora-burger-close) {
     opacity: 0;
+    transform: rotate(-90deg);
   }
-  [aria-expanded="true"] .flora-burger span:nth-child(3) {
-    transform: translateY(-6.25px) rotate(-45deg);
+  [aria-expanded="true"] .flora-burger :global(.flora-burger-open) {
+    opacity: 0;
+    transform: rotate(90deg);
+  }
+  [aria-expanded="true"] .flora-burger :global(.flora-burger-close) {
+    opacity: 1;
+    transform: none;
   }
   /* Visible at once on open (so focus can land), hidden only after the fade on close. */
   .flora-nav-overlay {

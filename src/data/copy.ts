@@ -15,11 +15,8 @@ export const copy = {
   services: {
     heading: "Услуги",
     intro: "Секоја прилика има свое цвеќе. Кажете ни ја Вашата, а ние ќе се погрижиме за останатото.",
-    // Card action: opens call / Viber for that category.
-    orderLabel: "Нарачајте",
-    // Sheet that opens when a card is tapped (JS only; without JS the card just calls).
-    sheetLead: "Јавете ни се или пишете ни — заедно ќе се договориме за деталите.",
-    sheetClose: "Затвори",
+    // Each card opens the gallery on its own category. Read after the service name.
+    cardAction: "погледнете ја галеријата",
   },
 
   gallery: {
@@ -56,11 +53,17 @@ export const copy = {
 
   about: {
     heading: "За нас",
-    paragraphs: [
-      "Флора е бутик за цвеќе и подароци во Куманово.",
-      "Секој букет и аранжман го правиме по нарачка — ништо не чека готово на полица.",
-      "Прво прашуваме за приликата и за човекот што ќе го добие, а потоа ги бираме цвеќињата, боите и пакувањето.",
-      "Затоа секој подарок што ќе излезе од бутикот е единствен.",
+    lead: "Бутик за цвеќе и подароци во Куманово.",
+    // How an order goes, as a timeline. One short line per step.
+    stepsLabel: "Од разговор до подарок",
+    steps: [
+      { title: "Разговор", text: "За приликата и за кого е" },
+      { title: "Идеја", text: "Стил, бои и пакување" },
+      { title: "Избор на цвеќе", text: "Цвеќиња и бои по Ваш вкус" },
+      { title: "Изработка", text: "Рачно, по Ваша нарачка" },
+      // TODO: the brief listed "достава" here, but delivery is not confirmed —
+      // orders are picked up at the shop (see top of file). Confirm with the owner.
+      { title: "Подигнување", text: "Подарокот Ве чека во бутикот" },
     ],
     imageAlt:
       "Внатрешноста на бутикот Флора: ѕидови со пастелни розови, жолти, виолетови и зелени панели и полици полни со шарени панделки.",
@@ -68,16 +71,19 @@ export const copy = {
 
   contact: {
     heading: "Контакт",
-    intro: "Јавете се, пишете ни или свратете во бутикот.",
-    addressLabel: "Адреса",
-    phoneLabel: "Телефон",
-    hoursLabel: "Работно време",
-    hoursPending: "Работното време наскоро ќе го објавиме.", // shown only if site.hours is null
-    viber: "Viber",
+    // Group headings; shown in capitals.
+    call: "Повик",
+    message: "Порака",
+    visit: "Посета",
+    // Accessible names for icon-only links (contact section and footer).
+    phoneAction: "Јавете ни се на", // followed by site.phoneFormatted
     viberAction: "Пишете ни на Viber",
-    whatsapp: "WhatsApp",
     whatsappAction: "Пишете ни на WhatsApp",
-    instagram: "Instagram",
+    instagramAction: "Пишете ни на Instagram",
+    hoursLabel: "Работно време",
+    showMap: "Прикажи мапа",
+    openInMaps: "Отвори во Google Maps",
+    newWindow: "(се отвора во нов прозорец)",
     mapTitle: "Мапа — локација на бутикот Флора",
   },
 

@@ -1,0 +1,38 @@
+---
+import { Image } from "astro:assets";
+import { images } from "../../data/images";
+
+/**
+ * Every on-page logo goes through here. Only the height is chosen; the width
+ * always follows the artwork's own aspect ratio, so it is never stretched or
+ * letterboxed whatever file images.ts points at.
+ */
+interface Props {
+  variant: "full" | "wordmark";
+  /** Rendered height in CSS px. */
+  height: number;
+  /** Empty when a surrounding link already names it. */
+  alt?: string;
+  loading?: "eager" | "lazy";
+  class?: string;
+}
+
+const { variant, height, alt = "", loading = "lazy", class: className = "" } = Astro.props;
+const src = images.logo[variant];
+const width = Math.round((height * src.width) / src.height);
+---
+
+{/* WebP, not AVIF: the watercolour-with-alpha artwork compresses worse as AVIF. */}
+<Image
+  src={src}
+  alt={alt}
+  format="webp"
+  width={width}
+  height={height}
+  widths={[width, width * 2]}
+  sizes={`${width}px`}
+  quality={70}
+  loading={loading}
+  class:list={["block max-w-none", className]}
+  style={`width: ${width}px; height: ${height}px`}
+/>
