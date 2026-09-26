@@ -6,6 +6,8 @@
 export const copy = {
   hero: {
     kind: "Бутик за цвеќе",
+    // Second line of the h1, under the name: carries the search terms.
+    kicker: "Цвеќара и бутик за цвеќе во Куманово",
     // tagline comes from site.tagline
     lead: "Секој букет и аранжман го правиме по нарачка — за Вашата прилика и за човекот што ќе го добие.",
     callLabel: "Повикај", // followed by site.phoneFormatted

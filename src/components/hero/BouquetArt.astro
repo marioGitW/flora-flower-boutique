@@ -1,0 +1,316 @@
+---
+import { VIEWBOX, bouquet, defs } from "../../lib/bouquet";
+
+const { far, mid, near } = bouquet();
+---
+
+{
+  /*
+  The hero bouquet: three stacked SVGs drawn at build time (src/lib/bouquet.ts),
+  so it is all there without JavaScript. Every layer shares one viewBox, so
+  they line up exactly, and all use the gradients in the hidden SVG below.
+
+  Only the one-time intro animates inside the SVGs. Everything continuous
+  moves the HTML wrappers, which the browser composites on the GPU:
+    .bq-exit     tips back as the hero scrolls away
+    .bq-breathe  slow idle sway around the tie point
+    .bq-layer    pointer parallax on desktop (set by Hero.astro's script)
+
+  The box keeps the viewBox's 660:800 ratio, so percentages on the wrappers
+  land on bouquet coordinates: the tie point (0,0) is 50% 81.25%.
+*/
+}
+<div class="bq" aria-hidden="true">
+  {/* Not display:none, which breaks gradient references in Firefox. */}
+  <svg
+    class="bq-defs"
+    width="0"
+    height="0"
+    focusable="false"
+    set:html={defs()}
+  />
+  <div class="bq-exit" data-bq-exit>
+    <div class="bq-breathe">
+      <div class="bq-layer bq-far" data-bq-layer="far">
+        <svg viewBox={VIEWBOX} focusable="false" set:html={far} />
+      </div>
+      <div class="bq-layer" data-bq-layer="mid">
+        <svg viewBox={VIEWBOX} focusable="false" set:html={mid} />
+      </div>
+      <div class="bq-layer" data-bq-layer="near">
+        <svg viewBox={VIEWBOX} focusable="false" set:html={near} />
+      </div>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .bq {
+    position: relative;
+    height: 100%;
+    max-width: 100%;
+    aspect-ratio: 660 / 800;
+    margin-inline: auto;
+  }
+
+  .bq-defs {
+    position: absolute;
+  }
+
+  .bq-exit,
+  .bq-breathe,
+  .bq-layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  .bq-breathe {
+    transform-origin: 50% 81.25%;
+  }
+
+  .bq-layer svg {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Ground shadow under the stems (was a blurred SVG ellipse). */
+  .bq-exit::before {
+    content: "";
+    position: absolute;
+    left: 19%;
+    width: 62%;
+    top: 92.5%;
+    height: 10.5%;
+    background: radial-gradient(
+      closest-side,
+      rgb(58 51 48 / 0.11),
+      rgb(58 51 48 / 0.08) 55%,
+      rgb(58 51 48 / 0)
+    );
+  }
+
+  /* Blush glow behind the flowers: a 660-unit circle centred on (0,-390),
+     reaching a little above the viewBox. Moves with the far layer. */
+  .bq-far::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: -8.75%;
+    height: 82.5%;
+    background: radial-gradient(
+      closest-side,
+      rgb(244 221 220 / 0.95),
+      rgb(244 221 220 / 0.35) 55%,
+      rgb(244 221 220 / 0)
+    );
+  }
+
+  /* Each animated element turns and scales around its own 0,0; the CSS
+     translate/rotate that place it depend on this too. */
+  .bq .a {
+    transform-box: view-box;
+    transform-origin: 0 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* ── intro: 0.0s paper · 0.4s back blooms · 0.8s front blooms ·
+          1.1s eucalyptus and leaves · 1.6s gypsophila · 1.9s ribbon ── */
+    .bq .paper-l {
+      animation: bq-paper-l 1050ms
+        var(--spring-soft, cubic-bezier(0.22, 1.12, 0.36, 1)) var(--d) both;
+    }
+    .bq .paper-r {
+      animation: bq-paper-r 1050ms
+        var(--spring-soft, cubic-bezier(0.22, 1.12, 0.36, 1)) var(--d) both;
+    }
+    .bq .paper-c {
+      animation: bq-paper-c 1050ms
+        var(--spring-soft, cubic-bezier(0.22, 1.12, 0.36, 1)) var(--d) both;
+    }
+    .bq .paper-fl {
+      animation: bq-paper-fl 950ms
+        var(--spring-soft, cubic-bezier(0.22, 1.12, 0.36, 1)) var(--d) both;
+    }
+    .bq .paper-fr {
+      animation: bq-paper-fr 950ms
+        var(--spring-soft, cubic-bezier(0.22, 1.12, 0.36, 1)) var(--d) both;
+    }
+    .bq .shade {
+      animation: bq-fade 500ms ease-out 900ms both;
+    }
+    .bq .stems {
+      animation: bq-stems 800ms
+        var(--spring-soft, cubic-bezier(0.22, 1.12, 0.36, 1)) var(--d) both;
+    }
+    .bq .grow {
+      animation: bq-pop 900ms cubic-bezier(0.3, 0.7, 0.3, 1) var(--d) both;
+    }
+    .bq .rise {
+      animation: bq-rise 1150ms
+        var(--spring-soft, cubic-bezier(0.22, 1.12, 0.36, 1)) var(--d) both;
+    }
+    .bq .place {
+      animation: bq-place 950ms var(--spring, cubic-bezier(0.34, 1.45, 0.64, 1))
+        var(--d) both;
+    }
+    .bq .unfurl {
+      animation: bq-unfurl 900ms
+        var(--spring, cubic-bezier(0.34, 1.45, 0.64, 1)) var(--d) both;
+    }
+    .bq .ring {
+      animation: bq-ring 800ms var(--spring, cubic-bezier(0.34, 1.45, 0.64, 1))
+        var(--d) both;
+    }
+    .bq .pop {
+      animation: bq-pop 650ms var(--spring, cubic-bezier(0.34, 1.45, 0.64, 1))
+        var(--d) both;
+    }
+    .bq .knot {
+      animation: bq-pop 600ms var(--spring, cubic-bezier(0.34, 1.45, 0.64, 1))
+        var(--d) both;
+    }
+    .bq .loop-l {
+      animation: bq-loop-l 900ms
+        var(--spring, cubic-bezier(0.34, 1.45, 0.64, 1)) var(--d) both;
+    }
+    .bq .loop-r {
+      animation: bq-loop-r 900ms
+        var(--spring, cubic-bezier(0.34, 1.45, 0.64, 1)) var(--d) both;
+    }
+    .bq .tail-l {
+      animation: bq-tail-l 1300ms
+        var(--spring, cubic-bezier(0.34, 1.45, 0.64, 1)) var(--d) both;
+    }
+    .bq .tail-r {
+      animation: bq-tail-r 1300ms
+        var(--spring, cubic-bezier(0.34, 1.45, 0.64, 1)) var(--d) both;
+    }
+
+    /* ── idle, from 2.7s: one composited layer, never the SVG ── */
+    .bq-breathe {
+      animation: bq-breathe 7.5s ease-in-out 2.7s infinite;
+    }
+    [data-hero-paused] .bq-breathe {
+      animation-play-state: paused;
+    }
+
+    /* Scroll exit. Hero.astro's script does the same where this is missing. */
+    @supports (animation-timeline: view()) {
+      .bq-exit {
+        animation: bq-exit linear both;
+        animation-timeline: view();
+        animation-range: exit 0% exit 100%;
+      }
+    }
+  }
+
+  /* Parallax layers only exist where there is a mouse to drive them. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .bq-layer {
+      will-change: transform;
+    }
+  }
+
+  @keyframes bq-paper-l {
+    from {
+      transform: rotate(40deg) scaleY(0.5);
+    }
+  }
+  @keyframes bq-paper-r {
+    from {
+      transform: rotate(-40deg) scaleY(0.5);
+    }
+  }
+  @keyframes bq-paper-c {
+    from {
+      transform: scaleY(0.15);
+    }
+  }
+  @keyframes bq-paper-fl {
+    from {
+      transform: rotate(24deg) scale(0.8);
+    }
+  }
+  @keyframes bq-paper-fr {
+    from {
+      transform: rotate(-24deg) scale(0.8);
+    }
+  }
+  @keyframes bq-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes bq-stems {
+    from {
+      transform: scaleY(0);
+    }
+  }
+  @keyframes bq-rise {
+    from {
+      transform: translateY(240px) scale(0.55);
+    }
+  }
+  @keyframes bq-place {
+    from {
+      transform: translateY(-30px) scale(0.12) rotate(-40deg);
+    }
+  }
+  @keyframes bq-unfurl {
+    from {
+      transform: scale(0.18) rotate(-70deg);
+    }
+  }
+  @keyframes bq-ring {
+    from {
+      transform: scale(0.3) rotate(-60deg);
+    }
+  }
+  @keyframes bq-pop {
+    from {
+      transform: scale(0);
+    }
+  }
+  @keyframes bq-loop-l {
+    from {
+      transform: scale(0) rotate(35deg);
+    }
+  }
+  @keyframes bq-loop-r {
+    from {
+      transform: scale(0) rotate(-35deg);
+    }
+  }
+  @keyframes bq-tail-l {
+    from {
+      transform: rotate(55deg) scaleY(0.2);
+    }
+  }
+  @keyframes bq-tail-r {
+    from {
+      transform: rotate(-55deg) scaleY(0.2);
+    }
+  }
+
+  @keyframes bq-breathe {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(0.9deg);
+    }
+    75% {
+      transform: rotate(-0.9deg);
+    }
+  }
+
+  @keyframes bq-exit {
+    to {
+      transform: translateY(-10%) rotate(-6deg) scale(0.9);
+    }
+  }
+</style>

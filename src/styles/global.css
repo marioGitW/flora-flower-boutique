@@ -207,23 +207,6 @@ flora-draw-line {
   }
 }
 
-@keyframes flora-petal-drift {
-  0% {
-    transform: translate(0, -10%) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.7;
-  }
-  90% {
-    opacity: 0.7;
-  }
-  100% {
-    transform: translate(var(--flora-drift-x, 30px), 110vh) rotate(var(--flora-drift-rot, 360deg));
-    opacity: 0;
-  }
-}
-
 @keyframes flora-bloom {
   from {
     transform: scale(0) rotate(-30deg);
@@ -242,9 +225,5 @@ flora-draw-line {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-
-  .flora-petal-field {
-    display: none !important;
   }
 }

@@ -1,81 +1,90 @@
 ---
-import { Picture } from "astro:assets";
 import { site } from "../../data/site";
 import { copy } from "../../data/copy";
-import { images } from "../../data/images";
-import PetalField from "../motion/PetalField.astro";
-import Reveal from "../motion/Reveal.astro";
+import { fallingPetals } from "../../lib/bouquet";
+import { springVars } from "../../lib/spring";
+import BouquetArt from "../hero/BouquetArt.astro";
 import Icon from "../ui/Icon.astro";
-import Logo from "../ui/Logo.astro";
 ---
 
-{/*
-  The photo is its own sticky layer, outside the section: it stays pinned while the
-  hero text scrolls away at normal speed (no parallax on text) and the next section
-  slides up over it. Its sticky range is the wrapper around Hero + Services in
-  index.astro. Full-bleed on mobile, right-hand bleed from lg.
-*/}
-<div class="flora-hero-media sticky top-0 z-0 -mb-[100svh] h-[100svh] overflow-hidden" data-hero-media>
-  <div class="flora-hero-zoom absolute inset-0 lg:left-1/2">
-    <Picture
-      src={images.hero}
-      alt=""
-      formats={["avif", "webp"]}
-      fallbackFormat="webp"
-      widths={[390, 560, 741]}
-      sizes="(min-width: 1024px) 50vw, 100vw"
-      quality={55}
-      loading="eager"
-      class="h-full w-full object-cover object-[50%_30%]"
-    />
-    {/* Warm cream veil keeps text AA over the photo on mobile; on desktop the text sits on plain cream. */}
-    <div class="flora-hero-veil absolute inset-0 lg:hidden" aria-hidden="true"></div>
-    {/* Inside the zoom layer so it recedes with the photo instead of framing it. */}
-    <div class="flora-hero-shade absolute inset-0 bg-ink opacity-0" aria-hidden="true"></div>
-  </div>
-</div>
-
+{
+  /*
+  Copy comes first in the source, so the heading leads for screen readers
+  and crawlers; the grid puts the bouquet above it on phones and beside it
+  from 900px. Text is never hidden: it only settles into place, so the heading
+  paints on first frame and stays the LCP element whatever the art is doing.
+*/
+}
 <section
   id="pocetok"
-  class="flora-hero relative z-10 flex min-h-[92svh] items-center overflow-hidden lg:min-h-[100svh]"
+  class="flora-hero relative overflow-hidden"
   aria-labelledby="hero-title"
+  style={springVars}
+  data-hero
 >
-  <PetalField count={8} class="opacity-60 lg:right-1/2" />
+  <div
+    class="flora-hero__drift pointer-events-none absolute inset-0 z-[1]"
+    aria-hidden="true"
+  >
+    {
+      fallingPetals.map((p) => (
+        <span
+          class="flora-hero__fall"
+          style={`--x:${p.x}%;--dx:${p.dx}px;--dur:${p.dur}s;--del:${p.delay}s`}
+        >
+          <span
+            class="flora-hero__petal"
+            style={`--s:${p.size}px;--fl:${p.flutter}s;background-image:linear-gradient(to top,${p.base},${p.tip})`}
+          />
+        </span>
+      ))
+    }
+  </div>
 
-  <div class="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-24 lg:grid lg:grid-cols-2 lg:pb-24 lg:pt-28">
-    <div class="mx-auto max-w-md text-center lg:mx-0 lg:max-w-lg lg:pr-12 lg:text-left">
-      <Reveal>
-        <Logo variant="full" height={112} loading="eager" class="mx-auto mb-2 lg:mx-0 lg:-ml-2" />
-      </Reveal>
+  <div class="flora-hero__grid mx-auto max-w-6xl px-4">
+    <div class="flora-hero__copy relative z-[2]">
+      {
+        /* One plain-text heading: "Флора Цвеќара и бутик за цвеќе во Куманово".
+           The explicit space keeps the two lines from reading as one word.
+           The spans stay inline so the whole h1 is one text block, and one
+           LCP candidate, larger than the paragraphs below; the <br> only
+           breaks the line. The heading settles as a single element. */
+      }
+      <h1 id="hero-title" class="flora-hero__settle flora-hero__title" style="--t: 100ms">
+        <span class="flora-hero__name font-display font-black text-ink">{site.name}</span>{" "}<br
+          aria-hidden="true"
+        /><span class="flora-hero__kicker font-body font-semibold text-rose-ink">{copy.hero.kicker}</span>
+      </h1>
 
-      <Reveal delay={80}>
-        <h1 id="hero-title" class="font-display text-6xl leading-none text-ink lg:text-7xl">
-          {site.name}
-        </h1>
-      </Reveal>
+      <p
+        class="flora-hero__settle mt-3 max-w-[22ch] text-balance font-display text-[clamp(1.125rem,4.6vw,1.625rem)] leading-snug text-ink"
+        style="--t: 420ms"
+      >
+        {site.tagline}
+      </p>
 
-      <Reveal delay={160}>
-        <p class="mt-3 font-display text-2xl text-rose-ink lg:text-3xl">{copy.hero.kind}</p>
-      </Reveal>
+      <p
+        class="flora-hero__settle mt-3 max-w-md text-base leading-relaxed text-ink/90 lg:text-lg"
+        style="--t: 500ms"
+      >
+        {copy.hero.lead}
+      </p>
 
-      <Reveal delay={240}>
-        <p class="mt-6 font-display text-xl leading-snug text-ink lg:text-2xl">
-          {site.tagline}
-        </p>
-      </Reveal>
-
-      <Reveal delay={320}>
-        <p class="mt-3 text-base leading-relaxed text-ink/90 lg:text-lg">{copy.hero.lead}</p>
-      </Reveal>
-
-      {/* Not wrapped in Reveal: the call/Viber buttons must be usable on first paint, with or without JS. */}
-      <div class="mx-auto mt-8 grid max-w-xs gap-3 whitespace-nowrap sm:w-fit sm:max-w-none sm:grid-cols-2 lg:mx-0" data-hero-ctas>
+      {
+        /* Settles like the rest but is never hidden: usable on first paint, with or without JS. */
+      }
+      <div
+        class="flora-hero__settle mt-6 grid w-full max-w-xs gap-3 whitespace-nowrap sm:w-fit sm:max-w-none sm:grid-cols-2"
+        style="--t: 560ms"
+        data-hero-ctas
+      >
         <a
           href={site.phoneHref}
           class="inline-flex min-h-12 items-center justify-center gap-2 rounded bg-rose-ink px-5 py-3 text-base font-medium text-cream shadow-sm transition-colors hover:bg-rose-ink-hover"
         >
           <Icon name="phone" />
-          {copy.hero.callLabel} {site.phoneFormatted}
+          {copy.hero.callLabel}
+          {site.phoneFormatted}
         </a>
         <a
           href={site.viberHref}
@@ -85,89 +94,277 @@ import Logo from "../ui/Logo.astro";
           {copy.hero.viberLabel}
         </a>
       </div>
+
+      <address
+        class="flora-hero__settle mt-5 max-w-md text-sm not-italic leading-relaxed text-ink/80"
+        style="--t: 640ms"
+      >
+        <a
+          href={site.mapUrl}
+          target="_blank"
+          rel="noopener"
+          class="underline decoration-ink/30 underline-offset-4 transition-colors hover:text-rose-ink hover:decoration-rose-ink"
+          >{site.address.full}<span class="sr-only"> {copy.contact.newWindow}</span></a
+        >
+        <span aria-hidden="true">·</span>
+        {
+          site.hours.map((h) => (
+            <span class="whitespace-nowrap">
+              <span class="sr-only">{copy.contact.hoursLabel}: </span>
+              {h.days} {h.time}
+            </span>
+          ))
+        }
+      </address>
+    </div>
+
+    <div class="flora-hero__art">
+      <BouquetArt />
     </div>
   </div>
 </section>
 
 <style>
-  .flora-hero-zoom {
-    transform-origin: 50% 35%;
+  /* Spring curves arrive as inline linear() strings (src/lib/spring.ts);
+     browsers without linear() keep these cubic-bezier approximations. */
+  .flora-hero {
+    --spring: cubic-bezier(0.34, 1.45, 0.64, 1);
+    --spring-soft: cubic-bezier(0.22, 1.12, 0.36, 1);
+  }
+  @supports (animation-timing-function: linear(0, 1)) {
+    .flora-hero {
+      --spring: var(--spring-linear);
+      --spring-soft: var(--spring-soft-linear);
+    }
   }
 
-  /* Scroll-linked recede: transform/opacity only, driven by the compositor where supported. */
-  @keyframes flora-hero-recede {
-    to {
-      transform: scale(0.92);
+  /* Phones: bouquet on top, copy below. Top padding clears the fixed header. */
+  .flora-hero__grid {
+    display: grid;
+    grid-template-areas: "art" "copy";
+    gap: 0.25rem;
+    padding-block: 4.25rem 2.5rem;
+  }
+
+  /* Size reserved up front (height + the viewBox's ratio), so nothing shifts
+     as the SVG arrives. */
+  .flora-hero__art {
+    grid-area: art;
+    height: clamp(220px, 36svh, 400px);
+    aspect-ratio: 660 / 800;
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  /* Short phones (iPhone SE and landscape): a smaller bouquet, so both
+     buttons still fit on the first screen. */
+  @media (max-height: 700px) {
+    .flora-hero__grid {
+      padding-top: 3.75rem;
+    }
+    .flora-hero__art {
+      height: clamp(150px, 25svh, 190px);
     }
   }
-  @keyframes flora-hero-shade {
-    to {
-      opacity: 0.45;
+
+  .flora-hero__copy {
+    grid-area: copy;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Small strut on the h1 itself, so each line is as tall as its own text. */
+  .flora-hero__title {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  /* Line height leaves room for the descender of "р" above the kicker. */
+  .flora-hero__name {
+    font-size: clamp(3.625rem, 17vw, 7.5rem);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+  }
+
+  /* One line on a 375px phone. */
+  .flora-hero__kicker {
+    font-size: clamp(0.9375rem, 4.4vw, 1.25rem);
+    line-height: 1.5;
+  }
+
+  @media (min-width: 900px) {
+    .flora-hero {
+      display: flex;
+      align-items: center;
+      min-height: 100svh;
+    }
+    .flora-hero__grid {
+      width: 100%;
+      grid-template-areas: "copy art";
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      align-items: center;
+      gap: 1.5rem;
+      padding-block: 5.5rem 3.5rem;
+    }
+    .flora-hero__art {
+      height: min(640px, 76svh);
+    }
+    .flora-hero__copy {
+      align-items: flex-start;
+      text-align: left;
     }
   }
+
+  /* Falling petals: HTML, transform only, from 2.8s on. */
+  .flora-hero__fall {
+    position: absolute;
+    top: 0;
+    left: var(--x);
+    transform: translateY(-3rem);
+  }
+
+  .flora-hero__petal {
+    display: block;
+    width: calc(var(--s) * 0.57);
+    height: calc(var(--s) * 0.86);
+    border-radius: 50%;
+    opacity: 0.85;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: scroll()) {
-      .flora-hero-zoom {
-        animation: flora-hero-recede linear both;
-        animation-timeline: scroll(root);
-        animation-range: 0 100svh;
-      }
-      /* Darkening starts a little later so text still on screen keeps its contrast. */
-      .flora-hero-shade {
-        animation: flora-hero-shade linear both;
-        animation-timeline: scroll(root);
-        animation-range: 25svh 100svh;
-      }
+    .flora-hero__settle {
+      animation: flora-hero-settle 900ms var(--spring-soft) var(--t, 0ms) both;
+    }
+    .flora-hero__title {
+      animation-timing-function: var(--spring);
+    }
+
+    .flora-hero__fall {
+      animation: flora-hero-fall var(--dur) linear var(--del) infinite both;
+    }
+    .flora-hero__petal {
+      animation: flora-hero-flutter var(--fl) ease-in-out infinite alternate;
+    }
+    [data-hero-paused] .flora-hero__fall,
+    [data-hero-paused] .flora-hero__petal {
+      animation-play-state: paused;
     }
   }
 
-  .flora-hero-veil {
-    background:
-      linear-gradient(
-        to bottom,
-        rgb(251 247 242 / 0.5) 0%,
-        rgb(251 247 242 / 0.8) 30%,
-        rgb(251 247 242 / 0.86) 70%,
-        rgb(251 247 242 / 1) 100%
-      ),
-      rgb(244 221 220 / 0.18);
+  @media (prefers-reduced-motion: reduce) {
+    .flora-hero__drift {
+      display: none;
+    }
+  }
+
+  @keyframes flora-hero-settle {
+    from {
+      transform: translateY(14px);
+    }
+  }
+
+  @keyframes flora-hero-fall {
+    from {
+      transform: translate(0, -3rem);
+    }
+    to {
+      transform: translate(var(--dx), 115svh);
+    }
+  }
+
+  @keyframes flora-hero-flutter {
+    from {
+      transform: translateX(-14px) rotate(-30deg);
+    }
+    to {
+      transform: translateX(14px) rotate(40deg);
+    }
   }
 </style>
 
 <script>
-  // Fallback for browsers without scroll-driven animations: same effect via rAF,
-  // listening to scroll only while the photo is on screen.
-  const media = document.querySelector<HTMLElement>("[data-hero-media]");
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // The hero's only script, and none of it runs with reduced motion:
+  //  - pauses the idle sway and the petals while the hero is off screen
+  //  - drives the bouquet's scroll exit where CSS scroll timelines are missing
+  //  - pointer parallax, only on devices with a mouse
+  const hero = document.querySelector<HTMLElement>("[data-hero]");
 
-  if (media && !reduced && !CSS.supports("animation-timeline: scroll()")) {
-    const zoom = media.querySelector<HTMLElement>(".flora-hero-zoom")!;
-    const shade = media.querySelector<HTMLElement>(".flora-hero-shade")!;
-    let queued = false;
+  if (hero && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const art = hero.querySelector<HTMLElement>(".bq");
+    const exit = hero.querySelector<HTMLElement>("[data-bq-exit]");
+    const scrollFallback =
+      art && exit && !CSS.supports("animation-timeline", "view()")
+        ? { art, exit }
+        : null;
+    let frame = 0;
 
-    const update = () => {
-      queued = false;
-      const vh = window.innerHeight;
-      const clamp = (v: number) => Math.min(1, Math.max(0, v));
-      const p = clamp(window.scrollY / vh);
-      const q = clamp((window.scrollY - 0.25 * vh) / (0.75 * vh));
-      zoom.style.transform = `scale(${1 - 0.08 * p})`;
-      shade.style.opacity = String(0.45 * q);
+    // Same range as the CSS `exit 0% exit 100%`: 0 when the art's top reaches
+    // the top of the viewport, 1 when its bottom does.
+    const updateExit = () => {
+      frame = 0;
+      if (!scrollFallback) return;
+      const { top, height } = scrollFallback.art.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, -top / height));
+      scrollFallback.exit.style.transform = `translateY(${(-10 * p).toFixed(2)}%) rotate(${(-6 * p).toFixed(2)}deg) scale(${(1 - 0.1 * p).toFixed(3)})`;
     };
     const onScroll = () => {
-      if (!queued) {
-        queued = true;
-        requestAnimationFrame(update);
-      }
+      if (!frame) frame = requestAnimationFrame(updateExit);
     };
 
-    new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        window.addEventListener("scroll", onScroll, { passive: true });
-        update();
-      } else {
-        window.removeEventListener("scroll", onScroll);
+    new IntersectionObserver((entries) => {
+      const visible = entries[entries.length - 1].isIntersecting;
+      hero.toggleAttribute("data-hero-paused", !visible);
+      if (scrollFallback) {
+        if (visible) addEventListener("scroll", onScroll, { passive: true });
+        else removeEventListener("scroll", onScroll);
+        updateExit();
       }
-    }).observe(media);
+    }).observe(hero);
+
+    if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      // px at the hero's edge, per layer: back moves against the pointer, front with it.
+      const depth: Record<string, [number, number]> = {
+        far: [-9, -6],
+        mid: [3, 2],
+        near: [11, 7],
+      };
+      const layers = [
+        ...hero.querySelectorAll<HTMLElement>("[data-bq-layer]"),
+      ].map((el) => [el, depth[el.dataset.bqLayer ?? ""] ?? [0, 0]] as const);
+      let tx = 0;
+      let ty = 0;
+      let x = 0;
+      let y = 0;
+      let raf = 0;
+
+      const tick = () => {
+        x += (tx - x) * 0.08;
+        y += (ty - y) * 0.08;
+        for (const [el, [dx, dy]] of layers) {
+          el.style.transform = `translate3d(${(x * dx).toFixed(2)}px, ${(y * dy).toFixed(2)}px, 0)`;
+        }
+        raf =
+          Math.abs(tx - x) > 0.002 || Math.abs(ty - y) > 0.002
+            ? requestAnimationFrame(tick)
+            : 0;
+      };
+      const start = () => {
+        if (!raf) raf = requestAnimationFrame(tick);
+      };
+
+      hero.addEventListener("pointermove", (e) => {
+        const r = hero.getBoundingClientRect();
+        tx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+        ty = ((e.clientY - r.top) / r.height - 0.5) * 2;
+        start();
+      });
+      hero.addEventListener("pointerleave", () => {
+        tx = 0;
+        ty = 0;
+        start();
+      });
+    }
   }
 </script>
