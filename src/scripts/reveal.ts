@@ -1,8 +1,9 @@
 /**
  * Scroll reveal for every [data-reveal] element on the page. When an element's
  * top edge scrolls past 88% of the viewport it gets `.is-revealed`, once, and
- * global.css plays the entrance: a 28px rise and fade, or for
- * data-reveal="image" a fade while settling from 1.04 to 1.
+ * global.css plays the entrance: a 28px rise and fade, for
+ * data-reveal="image" a fade while settling from 1.04 to 1, or for
+ * data-reveal="wipe" a clip-path wipe from the bottom up.
  *
  * The hidden starting state only exists under `.js` and
  * prefers-reduced-motion: no-preference, so without JS or with reduced motion

@@ -123,6 +123,15 @@ flora-draw-line {
   .js [data-reveal="image"].is-revealed {
     animation-name: flora-reveal-image;
   }
+  /* data-reveal="wipe": uncovered bottom to top instead of faded. The end
+     state is inset past the edges, so a shadow on the element is never cut. */
+  .js [data-reveal="wipe"]:not(.is-revealed) {
+    opacity: 1;
+    clip-path: inset(100% 0 0 0);
+  }
+  .js [data-reveal="wipe"].is-revealed {
+    animation: flora-reveal-wipe 0.9s cubic-bezier(0.65, 0, 0.35, 1) var(--reveal-delay, 0ms) backwards;
+  }
 }
 
 /* Inset moulding line, after the painted wall panels in the shop. */
@@ -188,6 +197,15 @@ flora-draw-line {
   from {
     opacity: 0;
     transform: translateY(28px);
+  }
+}
+
+@keyframes flora-reveal-wipe {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(-3rem);
   }
 }
 

@@ -4,6 +4,8 @@ import type { ImageMetadata } from "astro";
 // swapped (e.g. for background-removed versions) without touching these.
 import heroShop from "../assets/images/site/hero-shop.png";
 import aboutInterior from "../assets/images/site/about-interior.png";
+import momentCar from "../assets/images/site/moment-car.jpg";
+import momentBride from "../assets/images/site/moment-bride.jpg";
 import logoFull from "../assets/images/site/logo-flora.png";
 import logoWordmark from "../assets/images/site/logo-wordmark.png";
 import logoMark from "../assets/images/site/logo-mark.png";
@@ -11,7 +13,11 @@ import flower from "../assets/images/site/flower-rotate-square.png";
 
 export const images = {
   hero: heroShop,
-  about: aboutInterior,
+  /** Shop interior, in the contact section's visit card. */
+  interior: aboutInterior,
+  // За нас collage. Both are 4:5 portraits, and small originals (~770px wide),
+  // so they are only ever shown at collage size, never full width.
+  moments: { car: momentCar, bride: momentBride },
   // Square, with the bloom on its centre: the band spins it around the
   // element's centre. A replacement must keep that framing or it will orbit.
   /** Cut-out rose in front of the marquee band. */

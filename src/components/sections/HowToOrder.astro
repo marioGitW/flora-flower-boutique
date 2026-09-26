@@ -1,20 +1,29 @@
 ---
 import { site } from "../../data/site";
 import { copy } from "../../data/copy";
-import Reveal from "../motion/Reveal.astro";
-import DrawLine from "../motion/DrawLine.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
+import ContactLinks from "../ui/ContactLinks.astro";
 import Icon from "../ui/Icon.astro";
 import SectionDivider from "../ui/SectionDivider.astro";
 
 const t = copy.howToOrder;
+const last = t.steps.length - 1;
 ---
 
+{/*
+  How to order, as a timeline. The line is one short segment per gap, each an
+  HTML element whose fill scales with scroll (CSS view timeline, composited;
+  the script below covers browsers without it). Every segment and node tracks
+  the same mark, 65% down the viewport, so the fill runs on continuously and
+  each node lights up as the fill reaches it, however tall its step is.
+  Nothing starts hidden: without JS, scroll timelines or motion, the line is
+  simply drawn.
+*/}
 <section id="kako-naracuvate" class="bg-mint/40 pb-20 pt-10 lg:pb-28 lg:pt-14" aria-labelledby="kako-title">
   <SectionDivider class="mb-10 lg:mb-14" />
   <div class="mx-auto max-w-6xl px-4 lg:grid lg:grid-cols-[5fr_7fr] lg:gap-16">
     <div class="lg:sticky lg:top-28 lg:self-start">
-      <SectionHeading id="kako-title" title={t.heading} intro={t.intro} alignLeftLg />
+      <SectionHeading id="kako-title" title={t.heading} alignLeftLg />
       <div class="mt-8 hidden lg:block" data-reveal style="--reveal-delay: 200ms">
         <a
           href={site.phoneHref}
@@ -26,24 +35,27 @@ const t = copy.howToOrder;
       </div>
     </div>
 
-    <ol class="mx-auto mt-12 max-w-md lg:mx-0 lg:mt-2 lg:max-w-none" role="list">
-      {t.steps.map((step, i) => (
-        <li>
-          {i > 0 && <DrawLine variant="botanical" class="mx-auto my-8 w-48 lg:mx-0 lg:my-10 lg:w-64" />}
-          <Reveal delay={80}>
-            <div class="text-center lg:flex lg:gap-8 lg:text-left">
-              <span class="block font-display text-5xl leading-none text-rose-ink lg:w-16 lg:flex-none lg:text-6xl" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
+    <div class="mx-auto mt-12 w-fit max-w-full lg:mx-0 lg:mt-2">
+      <p id="kako-steps" class="text-xs font-semibold uppercase tracking-[0.18em] text-rose-ink">{t.stepsLabel}</p>
+
+      <ol class="mt-6" aria-labelledby="kako-steps" data-steps>
+        {t.steps.map((step, i) => (
+          <li class:list={["relative pl-12", i < last && "pb-10"]}>
+            {i < last && (
+              <span class="flora-step__track" aria-hidden="true">
+                <span class="flora-step__fill" data-step-fill />
               </span>
-              <div>
-                <h3 class="mt-3 font-display text-2xl text-ink lg:mt-1 lg:text-3xl">{step.title}</h3>
-                <p class="mt-2 text-base leading-relaxed text-ink/80 lg:text-lg">{step.text}</p>
-              </div>
-            </div>
-          </Reveal>
-        </li>
-      ))}
-    </ol>
+            )}
+            <span class="flora-step__node" aria-hidden="true">
+              <span class="flora-step__dot" data-step-dot />
+            </span>
+            <h3 class="font-display text-2xl leading-8 text-ink">{step.title}</h3>
+            <p class="mt-1 text-base leading-relaxed text-ink/80">{step.text}</p>
+            {i === 0 && <ContactLinks channels={["phone", "viber", "whatsapp", "instagram"]} size="md" class="mt-4" />}
+          </li>
+        ))}
+      </ol>
+    </div>
 
     <div class="mt-12 text-center lg:hidden" data-reveal>
       <a
@@ -56,3 +68,142 @@ const t = copy.howToOrder;
     </div>
   </div>
 </section>
+
+<style>
+  /* 28px node beside a 32px title line: its centre sits 16px down. A segment
+     runs from this node's centre to the next one's (16px into the next step). */
+  .flora-step__node {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    border: 2px solid rgb(217 140 140 / 0.45);
+    border-radius: 50%;
+    background: var(--color-cream);
+  }
+
+  .flora-step__dot {
+    position: absolute;
+    inset: -2px;
+    border: 2px solid var(--color-rose-ink);
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-rose-ink) 0 5px, var(--color-cream) 5.5px);
+  }
+
+  .flora-step__track {
+    position: absolute;
+    top: 16px;
+    bottom: -16px;
+    left: 13px;
+    width: 2px;
+    background: rgb(217 140 140 / 0.35);
+  }
+
+  .flora-step__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--color-rose-ink);
+    transform-origin: top;
+  }
+
+  /* Scroll-linked: a segment fills while it passes the 65% mark (its top at
+     35vh above the viewport's bottom edge, then its bottom); a node lights
+     while its centre does. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .flora-step__track {
+        view-timeline: --flora-step-seg block;
+      }
+      .flora-step__fill {
+        animation: flora-step-fill linear both;
+        animation-timeline: --flora-step-seg;
+        animation-range: entry-crossing 35vh entry-crossing calc(100% + 35vh);
+      }
+      .flora-step__node {
+        view-timeline: --flora-step-node block;
+      }
+      .flora-step__dot {
+        animation: flora-step-dot linear both;
+        animation-timeline: --flora-step-node;
+        animation-range: entry-crossing calc(50% + 35vh - 10px) entry-crossing calc(50% + 35vh + 10px);
+      }
+    }
+
+    /* Script fallback: fills are set inline; nodes light by class. */
+    [data-steps].is-scripted .flora-step__dot {
+      transition:
+        opacity 0.25s ease-out,
+        transform 0.35s cubic-bezier(0.34, 1.45, 0.64, 1);
+    }
+    [data-steps].is-scripted .flora-step__dot:not(.is-reached) {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+  }
+
+  @keyframes flora-step-fill {
+    from {
+      transform: scaleY(0);
+    }
+  }
+
+  @keyframes flora-step-dot {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+  }
+</style>
+
+<script>
+  // Fallback where CSS scroll timelines are missing: the same fill and node
+  // timing, from each element's position against the 65% mark. Listens only
+  // while the list is on screen.
+  const list = document.querySelector<HTMLElement>("[data-steps]");
+
+  if (
+    list &&
+    !CSS.supports("animation-timeline", "view()") &&
+    !matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    const fills = [...list.querySelectorAll<HTMLElement>("[data-step-fill]")];
+    const dots = [...list.querySelectorAll<HTMLElement>("[data-step-dot]")];
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const mark = window.innerHeight * 0.65;
+      for (const fill of fills) {
+        const { top, height } = fill.parentElement!.getBoundingClientRect();
+        const p = Math.min(1, Math.max(0, (mark - top) / height));
+        fill.style.transform = `scaleY(${p.toFixed(3)})`;
+      }
+      for (const dot of dots) {
+        const { top, height } = dot.parentElement!.getBoundingClientRect();
+        dot.classList.toggle("is-reached", top + height / 2 <= mark);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    list.classList.add("is-scripted");
+    update();
+
+    new IntersectionObserver((entries) => {
+      const visible = entries[entries.length - 1].isIntersecting;
+      if (visible) {
+        addEventListener("scroll", schedule, { passive: true });
+        addEventListener("resize", schedule, { passive: true });
+      } else {
+        removeEventListener("scroll", schedule);
+        removeEventListener("resize", schedule);
+        cancelAnimationFrame(frame);
+        frame = 0;
+      }
+      update();
+    }).observe(list);
+  }
+</script>

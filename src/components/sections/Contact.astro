@@ -1,5 +1,7 @@
 ---
+import { Picture } from "astro:assets";
 import { site } from "../../data/site";
+import { images } from "../../data/images";
 import { copy } from "../../data/copy";
 import SectionHeading from "../ui/SectionHeading.astro";
 import ContactLinks from "../ui/ContactLinks.astro";
@@ -38,6 +40,20 @@ const eyebrow = "font-body text-xs font-semibold uppercase tracking-[0.18em] tex
 
       <div class="rounded-lg p-6 ring-1 ring-ink/10" data-reveal>
         <h3 class={eyebrow}>{t.visit}</h3>
+        {/* So people recognise the shop when they get there. */}
+        <div class="mt-4 aspect-[4/3] overflow-hidden rounded">
+          <Picture
+            src={images.interior}
+            alt={t.interiorAlt}
+            formats={["avif", "webp"]}
+            fallbackFormat="webp"
+            widths={[320, 480, 640]}
+            sizes="(min-width: 1200px) 320px, (min-width: 768px) 28vw, min(100vw - 5rem, 398px)"
+            quality={60}
+            loading="lazy"
+            class="h-full w-full object-cover object-[50%_40%]"
+          />
+        </div>
         <ul class="mt-4 space-y-3 text-ink/85" role="list">
           <li class="flex gap-3">
             <Icon name="place" class="mt-0.5 text-rose-ink" />

@@ -8,12 +8,14 @@ interface Props {
   intro?: string;
   /** Left-align from lg up (editorial two-column sections). */
   alignLeftLg?: boolean;
+  /** Same, from 900px, for sections that go two-column there. */
+  alignLeft900?: boolean;
   class?: string;
 }
 
-const { id, title, intro, alignLeftLg = false, class: className = "" } = Astro.props;
-const align = alignLeftLg ? "text-center lg:text-left" : "text-center";
-const lineAlign = alignLeftLg ? "mx-auto lg:mx-0" : "mx-auto";
+const { id, title, intro, alignLeftLg = false, alignLeft900 = false, class: className = "" } = Astro.props;
+const align = alignLeft900 ? "text-center min-[900px]:text-left" : alignLeftLg ? "text-center lg:text-left" : "text-center";
+const lineAlign = alignLeft900 ? "mx-auto min-[900px]:mx-0" : alignLeftLg ? "mx-auto lg:mx-0" : "mx-auto";
 ---
 
 <div class:list={[align, className]}>

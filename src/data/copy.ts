@@ -40,42 +40,34 @@ export const copy = {
     counter: "од", // "3 од 16"
   },
 
+  // The one place the page explains ordering: a timeline, one short line per
+  // step. The first step also shows the phone and message links.
   howToOrder: {
     heading: "Како нарачувате",
-    intro: "Едноставно е — три чекори и готово.",
+    stepsLabel: "Од разговор до подарок",
     steps: [
-      {
-        title: "Јавете се или пишете",
-        text: "Јавете ни се на телефон или пишете ни на Viber, WhatsApp или Instagram.",
-      },
-      {
-        title: "Се договараме",
-        text: "Кажете ни за приликата и за кого е цвеќето. Заедно ги избираме деталите, стилот и буџетот.",
-      },
-      {
-        title: "Подготвуваме за Вас",
-        text: "Аранжманот го изработуваме рачно, по Ваша нарачка, и Ве чека во бутикот.",
-      },
+      { title: "Разговор", text: "Јавете се или пишете" },
+      { title: "Идеја", text: "Стил, бои и пакување" },
+      { title: "Избор на цвеќе", text: "Цвеќиња и бои по Ваш вкус" },
+      { title: "Изработка", text: "Рачно, по Ваша нарачка" },
+      // TODO: confirm with owner whether they deliver. Until then this stays
+      // pickup only (see top of file); don't mention delivery anywhere.
+      { title: "Подигнување", text: "Подарокот Ве чека во бутикот" },
     ],
     cta: "Повикај", // followed by site.phoneFormatted
   },
 
+  // Who the shop is, told through two moments from customers' weddings.
   about: {
     heading: "За нас",
-    lead: "Бутик за цвеќе и подароци во Куманово.",
-    // How an order goes, as a timeline. One short line per step.
-    stepsLabel: "Од разговор до подарок",
-    steps: [
-      { title: "Разговор", text: "За приликата и за кого е" },
-      { title: "Идеја", text: "Стил, бои и пакување" },
-      { title: "Избор на цвеќе", text: "Цвеќиња и бои по Ваш вкус" },
-      { title: "Изработка", text: "Рачно, по Ваша нарачка" },
-      // TODO: the brief listed "достава" here, but delivery is not confirmed —
-      // orders are picked up at the shop (see top of file). Confirm with the owner.
-      { title: "Подигнување", text: "Подарокот Ве чека во бутикот" },
-    ],
-    imageAlt:
-      "Внатрешноста на бутикот Флора: ѕидови со пастелни розови, жолти, виолетови и зелени панели и полици полни со шарени панделки.",
+    // TODO: draft copy — statement, body and tags are for the owner to review.
+    statement: "Секој букет е дел од нечија приказна.",
+    body: "Флора е бутик за цвеќе и подароци во Куманово. Секој аранжман го изработуваме рачно, по Ваша нарачка — а во бутикот ќе најдете и готови букети, аранжмани и подароци.",
+    tags: ["Рачна изработка", "Готови подароци во бутикот", "Чоколатца со наше лого"],
+    photos: {
+      car: "Невеста со букет од бели каранфили и младоженец со шампањ во автомобил, по венчавката",
+      bride: "Невеста во бел фустан носи букет од бели каранфили",
+    },
   },
 
   contact: {
@@ -94,6 +86,8 @@ export const copy = {
     openInMaps: "Отвори во Google Maps",
     newWindow: "(се отвора во нов прозорец)",
     mapTitle: "Мапа — локација на бутикот Флора",
+    // Photo in the visit card, so people recognise the shop when they arrive.
+    interiorAlt: "Внатрешноста на бутикот Флора во Куманово",
   },
 
   nav: {
@@ -108,8 +102,8 @@ export const copy = {
     links: [
       { href: "#uslugi", label: "Услуги" },
       { href: "#galerija", label: "Галерија" },
-      { href: "#kako-naracuvate", label: "Како нарачувате" },
       { href: "#za-nas", label: "За нас" },
+      { href: "#kako-naracuvate", label: "Како нарачувате" },
       { href: "#kontakt", label: "Контакт" },
     ],
   },
