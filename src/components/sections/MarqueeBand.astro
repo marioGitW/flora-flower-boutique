@@ -1,0 +1,270 @@
+---
+import { Picture } from "astro:assets";
+import { copy } from "../../data/copy";
+import { images } from "../../data/images";
+
+const { phrases } = copy.band;
+---
+
+{/*
+  Giant tagline sliding behind a spinning rose. Two motions, independent:
+  the text is tied to scroll position (CSS scroll timeline, or the script
+  below where that is missing), the rose turns and floats on a clock.
+  Nothing is pinned; the band scrolls past like any section.
+
+  The moving row holds two identical copies; sliding it by -50% lands copy
+  two where copy one began, so no edge ever shows a gap. Where the row can't
+  move (reduced motion; no JS and no scroll timeline) a still layout shows
+  the two phrases stacked around the rose instead.
+
+  Positioned above the hero photo, which is sticky at z-0 and can hang up to
+  a screen below its wrapper; otherwise it shows through this background.
+*/}
+<div class="flora-band relative z-10 bg-cream" data-flora-band>
+  <p class="sr-only">{phrases.join(", ")}.</p>
+
+  <div class="flora-band__row" aria-hidden="true" data-flora-band-row>
+    {
+      [0, 1].map(() => (
+        <span class="flora-band__copy">
+          {[0, 1, 2].map((i) => (
+            <span class="flora-band__unit" data-repeat={i}>
+              {phrases.map((p) => (
+                <>
+                  <span>{p}</span>
+                  <span class="flora-band__sep">•</span>
+                </>
+              ))}
+            </span>
+          ))}
+        </span>
+      ))
+    }
+  </div>
+
+  <div class="flora-band__still" aria-hidden="true">
+    {phrases.map((p) => <span>{p}</span>)}
+  </div>
+
+  <div class="flora-band__flower" aria-hidden="true">
+    <div class="flora-band__float">
+      <Picture
+        src={images.flower}
+        alt=""
+        formats={["avif", "webp"]}
+        fallbackFormat="webp"
+        widths={[120, 240, 360, 480, 640]}
+        sizes="(min-width: 960px) 288px, 30vw"
+        quality={70}
+        draggable="false"
+        class="flora-band__spin"
+      />
+    </div>
+  </div>
+</div>
+
+<style>
+  .flora-band {
+    /* Rose width: ~30% of a phone screen, capped by height on landscape.
+       Rose and type are sized together so both words fit whole beside the
+       rose on a phone; a larger rose or type hides most of each word. */
+    --flower-w: clamp(6rem, min(30vw, 40svh), 18rem);
+
+    display: flex;
+    align-items: center;
+    /* Fixed, so nothing shifts when it enters. The rose's full sweep stays
+       inside its square box; the rest is room for the float. */
+    height: calc(var(--flower-w) + 2rem);
+    /* clip, not hidden: no scroll container, so sticky elsewhere keeps working. */
+    overflow-x: clip;
+    isolation: isolate;
+    view-timeline: --flora-band block;
+  }
+
+  .flora-band__row,
+  .flora-band__still {
+    font-family: var(--font-display);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    /* rose on cream is ~2.4:1; rose-deep clears the 3:1 large-text bar. */
+    color: var(--color-rose-deep);
+    user-select: none;
+  }
+
+  .flora-band__row {
+    display: flex;
+    flex: none;
+    /* ~8vw on a phone (31px at 390), rising to the 8rem cap by ~1100px. */
+    font-size: clamp(1.75rem, 13.66vw - 1.4rem, 8rem);
+  }
+
+  .flora-band__copy,
+  .flora-band__unit {
+    display: flex;
+    flex: none;
+  }
+
+  /* A copy must be at least as wide as the screen, or the end of the slide
+     shows a gap. One phrase is ~11.5em: narrower than a phone at phone sizes
+     and 1473px at the 8rem cap, so each copy holds it twice (2946px), and
+     three times on screens wider than that. */
+  .flora-band__unit[data-repeat="2"] {
+    display: none;
+  }
+
+  @media (min-width: 2880px) {
+    .flora-band__unit[data-repeat="2"] {
+      display: flex;
+    }
+  }
+
+  .flora-band__sep {
+    padding-inline: 0.3em;
+  }
+
+  .flora-band__still {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    /* The rose sits in the gap between the two lines. */
+    gap: calc(var(--flower-w) + 1.5rem);
+    padding-block: 3rem;
+    font-size: clamp(2.25rem, 12vw, 8rem);
+  }
+
+  .flora-band__flower {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    width: var(--flower-w);
+    translate: -50% -50%;
+    pointer-events: none;
+  }
+
+  .flora-band__flower :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .flora-band__row {
+        animation: flora-band-slide linear both;
+        animation-timeline: --flora-band;
+        animation-range: entry 0% exit 100%;
+      }
+    }
+
+    /* Durations share no small common multiple, so float and spin never visibly line up. */
+    .flora-band__float {
+      animation: flora-band-float 6.7s ease-in-out infinite;
+    }
+
+    .flora-band__flower :global(img) {
+      animation: flora-band-spin 22s linear infinite;
+    }
+  }
+
+  /* Still layout: no motion wanted, or no way to drive the row. The rose is
+     smaller, between the two phrases. */
+  @media (prefers-reduced-motion: reduce) {
+    .flora-band {
+      --flower-w: clamp(7rem, 30vw, 12rem);
+      height: auto;
+    }
+    .flora-band__row {
+      display: none;
+    }
+    .flora-band__still {
+      display: flex;
+    }
+  }
+
+  @supports not (animation-timeline: view()) {
+    :global(html:not(.js)) .flora-band {
+      --flower-w: clamp(7rem, 30vw, 12rem);
+      height: auto;
+    }
+    :global(html:not(.js)) .flora-band__row {
+      display: none;
+    }
+    :global(html:not(.js)) .flora-band__still {
+      display: flex;
+    }
+  }
+
+  @keyframes flora-band-slide {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  @keyframes flora-band-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  @keyframes flora-band-float {
+    0%,
+    100% {
+      transform: translate3d(0, -5px, 0);
+    }
+    50% {
+      transform: translate3d(0, 5px, 0);
+    }
+  }
+</style>
+
+<script>
+  // Fallback where CSS scroll timelines are missing: the same slide, mapped
+  // from the band's trip through the viewport (0 as its top enters at the
+  // bottom, 1 as its bottom leaves at the top). Listens only while on screen.
+  const band = document.querySelector<HTMLElement>("[data-flora-band]");
+  const row = band?.querySelector<HTMLElement>("[data-flora-band-row]");
+
+  if (
+    band &&
+    row &&
+    !CSS.supports("animation-timeline", "view()") &&
+    !matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const { top, height } = band.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const progress = Math.min(1, Math.max(0, (vh - top) / (vh + height)));
+      row.style.transform = `translate3d(${-50 * progress}%, 0, 0)`;
+    };
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    new IntersectionObserver((entries) => {
+      const visible = entries[entries.length - 1].isIntersecting;
+      if (visible) {
+        addEventListener("scroll", schedule, { passive: true });
+        addEventListener("resize", schedule, { passive: true });
+      } else {
+        removeEventListener("scroll", schedule);
+        removeEventListener("resize", schedule);
+        cancelAnimationFrame(frame);
+        frame = 0;
+      }
+      // Entering: start from the right place. Leaving: settle at the end.
+      update();
+    }).observe(band);
+  }
+</script>

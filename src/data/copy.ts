@@ -20,6 +20,12 @@ export const copy = {
     cardAction: "Погледнете ја галеријата.",
   },
 
+  // Scrolling band between services and the gallery. Shown in capitals,
+  // joined by a bullet; read out once as a sentence.
+  band: {
+    phrases: ["Свежо", "со љубов"],
+  },
+
   gallery: {
     heading: "Галерија",
     intro: "Дел од она што сме го изработиле досега. Секоја нарачка е различна — како и приликата за која е наменета.",
