@@ -46,8 +46,6 @@ const cards = services.map((s, i) => ({
           <a
             href="#galerija"
             data-gallery-filter={card.id}
-            aria-label={`${card.name}: ${copy.services.cardAction}`}
-            aria-describedby={`usluga-${card.id}`}
             class:list={[
               "group flex h-full flex-col overflow-hidden rounded-lg bg-white/60 shadow-[0_1px_0_rgb(58_51_48/0.06)] ring-1 ring-ink/5 transition-[box-shadow,background-color] duration-200 hover:bg-white hover:shadow-md hover:ring-rose/40 focus-visible:bg-white focus-visible:shadow-md",
               card.wide && "lg:flex-row",
@@ -80,8 +78,11 @@ const cards = services.map((s, i) => ({
               <h3 class:list={["font-display text-lg leading-snug text-ink sm:text-xl", card.wide && "lg:text-3xl"]}>
                 {card.name}
               </h3>
-              <p id={`usluga-${card.id}`} class:list={["mt-1.5 text-sm leading-relaxed text-ink/80", card.wide && "lg:mt-3 lg:text-base"]}>
+              {/* The link's name is its visible text plus the hidden action, so
+                  what is read out always contains what is shown. */}
+              <p class:list={["mt-1.5 text-sm leading-relaxed text-ink/80", card.wide && "lg:mt-3 lg:text-base"]}>
                 {card.description}
+                <span class="sr-only"> {copy.services.cardAction}</span>
               </p>
               {/* Quiet cue that the card leads somewhere; nudges on hover/focus. */}
               <Icon

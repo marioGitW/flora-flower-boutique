@@ -15,8 +15,9 @@ export const copy = {
   services: {
     heading: "Услуги",
     intro: "Секоја прилика има свое цвеќе. Кажете ни ја Вашата, а ние ќе се погрижиме за останатото.",
-    // Each card opens the gallery on its own category. Read after the service name.
-    cardAction: "погледнете ја галеријата",
+    // Each card opens the gallery on its own category. Screen readers only,
+    // read after the card's description.
+    cardAction: "Погледнете ја галеријата.",
   },
 
   gallery: {

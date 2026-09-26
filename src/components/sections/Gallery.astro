@@ -257,11 +257,13 @@ const items = await Promise.all(
 
       /** Scrolls the chip row (never the page) so `chip` is fully visible. */
       const reveal = (chip: HTMLElement, behavior: ScrollBehavior) => {
-        const pad = 16;
-        const left = chip.offsetLeft - pad;
-        const right = chip.offsetLeft + chip.offsetWidth + pad - row.clientWidth;
-        const target = row.scrollLeft > left ? left : row.scrollLeft < right ? right : null;
-        if (target === null) return;
+        const pad = 16; // matches scroll-padding-inline
+        const start = chip.offsetLeft - pad;
+        const fits = row.scrollLeft <= start && chip.offsetLeft + chip.offsetWidth + pad <= row.scrollLeft + row.clientWidth;
+        if (fits) return;
+        // Snapping is mandatory and aligns chip starts, so aim for this chip's
+        // own snap position; anything in between would be snapped back.
+        const target = start;
         if (behavior === "instant") {
           // Not the user's doing — keep the hint.
           programmatic = true;
